@@ -1,4 +1,5 @@
-# 🎓 AI-Powered Exam System
+# 🎓 Albab AI-Powered Exam System
+By **Rashedul Albab**
 
 A robust, scalable exam management system powered by AI (Groq's Llama 3) for automated evaluation of MCQs, short answers, and essay questions. Built with FastAPI, SQLite, and modern web technologies.
 
@@ -9,6 +10,7 @@ A robust, scalable exam management system powered by AI (Groq's Llama 3) for aut
 - [Features](#-features)
 - [Architecture](#-architecture)
 - [Tech Stack](#-tech-stack)
+- [Docker & CI/CD](#🐳-docker--cicd)
 - [Setup Instructions](#-setup-instructions)
   - [Local Development](#local-development)
   - [Docker Setup](#docker-setup)
@@ -94,6 +96,31 @@ A robust, scalable exam management system powered by AI (Groq's Llama 3) for aut
 - **Frontend**: Jinja2 Templates, HTML, CSS, JavaScript
 - **Deployment**: Docker, Uvicorn
 - **Queue System**: Custom priority queue with retry logic
+
+---
+
+## 🐳 Docker & CI/CD
+
+This project is fully containerized and set up for automated deployment.
+
+### **Docker Hub**
+The official container image is available at:
+`rashedulalbab1234/ai-exam-system:latest`
+
+### **GitHub Actions (CI/CD)**
+The project uses GitHub Actions to automatically build and push the Docker image to Docker Hub on every push to the `main` branch.
+
+**To set up the CI/CD pipeline:**
+1. Go to your GitHub Repository **Settings** > **Secrets and variables** > **Actions**.
+2. Add the following **Repository secrets**:
+   - `DOCKER_USERNAME`: Your Docker Hub username (`rashedulalbab1234`)
+   - `DOCKER_PASSWORD`: Your Docker Hub Personal Access Token (PAT).
+
+### **Running with Docker**
+```bash
+docker pull rashedulalbab1234/ai-exam-system:latest
+docker run -p 8000:8000 --env-file .env rashedulalbab1234/ai-exam-system:latest
+```
 
 ---
 
@@ -375,4 +402,4 @@ For issues, questions, or suggestions:
 
 ---
 
-**Made with ❤️ by the ACI-MIS Team**
+**Made with ❤️ by Rashedul Albab**
