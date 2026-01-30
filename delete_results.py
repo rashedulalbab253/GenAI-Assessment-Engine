@@ -5,27 +5,23 @@ def clean_database():
     conn = sqlite3.connect('exam_system.db')
     cursor = conn.cursor()
     
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-    tables = [row[0] for row in cursor.fetchall()]
+    tables = ['exam_results', 'live_sessions', 'exam_sessions']
+    search_terms = ['%enamul%', '%atiq%', '%enam%']
     
-    deleted_count = 0
+    total_deleted = 0
     
-    # Try multiple variations and case-insensitive search
-    search_term = '%enamul%'
-    
-    if 'exam_results' in tables:
-        cursor.execute(f"DELETE FROM exam_results WHERE candidate_name LIKE ?", (search_term,))
-        deleted_count = cursor.rowcount
-        conn.commit()
-        print(f"DELETED_{deleted_count}_RECORDS_FROM_EXAM_RESULTS")
-
-    if 'live_sessions' in tables:
-        cursor.execute("DELETE FROM live_sessions WHERE candidate_name LIKE ?", (search_term,))
-        print(f"DELETED_{cursor.rowcount}_RECORDS_FROM_LIVE_SESSIONS")
-        conn.commit()
+    for table in tables:
+        try:
+            for term in search_terms:
+                cursor.execute(f"DELETE FROM {table} WHERE candidate_name LIKE ?", (term,))
+                total_deleted += cursor.rowcount
+            conn.commit()
+            print(f"Cleaned {table}")
+        except Exception as e:
+            print(f"Error cleaning {table}: {e}")
 
     conn.close()
-    print("FINISHED_CLEANING")
+    print(f"TOTAL_DELETED: {total_deleted}")
 
 if __name__ == "__main__":
     clean_database()
