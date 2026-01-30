@@ -145,22 +145,90 @@
             line-height: 1.5;
         }
         
-        .contact-info {
-            background: #fef2f2;
-            border: 2px solid #fecaca;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 30px;
+        .support-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 40px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
         
-        .contact-info h3 {
-            color: #dc2626;
-            margin-bottom: 10px;
+        .support-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+            border-color: #667eea;
+        }
+
+        .support-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
         }
         
-        .contact-info p {
-            color: #991b1b;
-            margin-bottom: 5px;
+        .support-card h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            text-align: left;
+        }
+
+        .support-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .support-icon {
+            background: #f0f4ff;
+            color: #667eea;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .support-text h4 {
+            font-size: 0.85rem;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 2px;
+        }
+
+        .support-text p {
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .support-footer {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+            color: #718096;
+            font-style: italic;
         }
         
         .admin-link {
@@ -243,11 +311,30 @@
             
         </div>
         
-        <div class="contact-info">
-            <h3>Need Help?</h3>
-            <p><strong>Technical Support:</strong> aci-bd@gmail.com</p>
-            <p><strong>Phone:</strong> +880 1798 029380</p>
-            <p><em>If you face any technical difficulties during the exam, contact us immediately.</em></p>
+        <div class="support-card">
+            <h3>🎧 Need Technical Help?</h3>
+            
+            <div class="support-grid">
+                <div class="support-item">
+                    <div class="support-icon">📧</div>
+                    <div class="support-text">
+                        <h4>Email Support</h4>
+                        <p>support@examportal.ai</p>
+                    </div>
+                </div>
+                
+                <div class="support-item">
+                    <div class="support-icon">📞</div>
+                    <div class="support-text">
+                        <h4>Hotline</h4>
+                        <p>+880 1XXX XXXXXX</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="support-footer">
+                If you encounter any technical difficulties during your session, please reach out to our support team immediately.
+            </div>
         </div>
     </div>
     
