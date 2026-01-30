@@ -4,6 +4,7 @@ Contains all API routes and web endpoints
 """
 
 from fastapi import FastAPI, Request, Form, HTTPException, Depends, status
+from contextlib import asynccontextmanager
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
 from fastapi.security import HTTPBasic
@@ -42,7 +43,33 @@ ADMIN_SESSION_TIMEOUT = 30  # Session timeout in minutes
 UPLOAD_DIR = Path("uploads/images")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
-app = FastAPI(title="Admin-Controlled Exam System")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifecycle events (startup and shutdown)"""
+    print("🚀 Starting application...")
+    
+    # Start background evaluation queue
+    # Note: evaluation_queue is initialized later in this file but will be available at runtime
+    if 'evaluation_queue' in globals():
+        evaluation_queue.start()
+        print("✅ Background evaluation queue started")
+    
+    # Recover active exam sessions from database
+    if 'recover_exam_sessions' in globals():
+        recover_exam_sessions()
+
+    # Recover pending evaluations from database
+    if 'recover_pending_evaluations' in globals():
+        recover_pending_evaluations()
+        
+    yield
+    
+    print("🛑 Shutting down application...")
+    if 'evaluation_queue' in globals():
+        evaluation_queue.stop()
+        print("✅ Background evaluation queue stopped")
+
+app = FastAPI(title="Admin-Controlled Exam System", lifespan=lifespan)
 templates = Jinja2Templates(directory="templates", auto_reload=True)
 security = HTTPBasic()
 
@@ -193,27 +220,8 @@ def recover_pending_evaluations():
         print(f"❌ Error during evaluation recovery: {str(e)}")
 
 
-# Startup and shutdown events for the evaluation queue
-@app.on_event("startup")
-async def startup_event():
-    """Start the background evaluation worker when the app starts"""
-    print("🚀 Starting application...")
-    evaluation_queue.start()
-    print("✅ Background evaluation queue started")
+# Startup and shutdown events are now handled by lifespan context manager
 
-    # Recover active exam sessions from database after server restart
-    recover_exam_sessions()
-
-    # Recover pending evaluations from database after server restart
-    recover_pending_evaluations()
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Stop the background evaluation worker gracefully"""
-    print("🛑 Shutting down application...")
-    evaluation_queue.stop()
-    print("✅ Background evaluation queue stopped")
 
 
 # Helper Functions for Session Management
