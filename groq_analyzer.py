@@ -468,28 +468,28 @@ class GroqAnalyzer:
         # Determine the target language for questions
         if section_type == 'bengali':
             target_language = 'bengali'
-            language_instruction = \"""
+            language_instruction = """
             📤 CRITICAL LANGUAGE REQUIREMENT: ALL questions, options, and explanations MUST be written in BENGALI language.
             Use proper Bengali script (বাংলা) for all content in this section.
-            \"""
+            """
         elif section_type == 'english':
             target_language = 'english'
-            language_instruction = \"""
+            language_instruction = """
             📤 CRITICAL LANGUAGE REQUIREMENT: ALL questions, options, and explanations MUST be written in ENGLISH language.
             This section tests English language proficiency, so use proper English for all content.
-            \"""
+            """
         else:
             target_language = exam_language
             if exam_language == 'bengali':
-                language_instruction = \"""
+                language_instruction = """
                 📤 CRITICAL LANGUAGE REQUIREMENT: ALL questions, options, and explanations MUST be written in BENGALI language.
                 Use proper Bengali script (বাংলা) for all content. This is a Bengali language exam.
-                \"""
+                """
             else:
-                language_instruction = \"""
+                language_instruction = """
                 📤 CRITICAL LANGUAGE REQUIREMENT: ALL questions, options, and explanations MUST be written in ENGLISH language.
                 Use proper English for all content. This is an English language exam.
-                \"""
+                """
 
         # Get section description (pass section_config for custom sections)
         section_description = self._get_section_description(section_type, department, position, section_config)
@@ -501,23 +501,23 @@ class GroqAnalyzer:
 
         # Difficulty level instruction
         difficulty_instructions = {
-            'easy': \"""
+            'easy': """
             🟢 DIFFICULTY LEVEL: EASY
             - Questions should test basic knowledge and fundamental concepts
             - Use straightforward language and clear scenarios
             - MCQ options should be clearly distinguishable
             - Focus on recall and basic understanding
             - Suitable for entry-level candidates or freshers
-            \""",
-            'medium': \"""
+            """,
+            'medium': """
             🟡 DIFFICULTY LEVEL: MEDIUM
             - Questions should test intermediate understanding and application
             - Include scenarios that require applying knowledge to solve problems
             - MCQ options should require careful thinking to differentiate
             - Balance between knowledge recall and practical application
             - Suitable for candidates with 1-3 years of experience
-            \""",
-            'hard': \"""
+            """,
+            'hard': """
             🔴 DIFFICULTY LEVEL: HARD
             - Questions should test advanced concepts and deep understanding
             - Include complex scenarios requiring analysis and critical thinking
@@ -525,32 +525,32 @@ class GroqAnalyzer:
             - Focus on problem-solving, analysis, and evaluation
             - Include edge cases and real-world complex scenarios
             - Suitable for senior/experienced candidates
-            \""",
-            'mixed': \"""
+            """,
+            'mixed': """
             🎯 DIFFICULTY LEVEL: MIXED (Progressive)
             - Include a mix of easy, medium, and hard questions
             - Start with easier questions and progressively increase difficulty
             - Distribution: approximately 30% easy, 40% medium, 30% hard
             - This provides a comprehensive assessment across all competency levels
-            \"""
+            """
         }
         difficulty_instruction = difficulty_instructions.get(difficulty_level, difficulty_instructions['medium'])
 
         # Custom instructions from admin
         admin_instructions = ""
         if custom_instructions and custom_instructions.strip():
-            admin_instructions = f\"""
+            admin_instructions = f"""
 
             📋 ADMIN'S CUSTOM INSTRUCTIONS (IMPORTANT):
             {custom_instructions.strip()}
 
             ⚠️ Please follow these custom instructions provided by the exam administrator when generating questions.
-            \"""
+            """
 
         # Enhanced custom syllabus handling
         syllabus_instruction = ""
         if syllabus.strip():
-            syllabus_instruction = f\"""
+            syllabus_instruction = f"""
 
             🎯 CUSTOM SYLLABUS/REQUIREMENTS (HIGHEST PRIORITY):
             {syllabus.strip()}
@@ -559,16 +559,16 @@ class GroqAnalyzer:
             The syllabus topics take HIGHEST PRIORITY over general section descriptions.
             Focus specifically on the topics, technologies, and requirements mentioned in the custom syllabus.
             Ensure every question directly relates to the specified syllabus content.
-            \"""
+            """
 
         # Build multi-select instruction if needed
         multi_select_instruction = ""
         min_correct_for_multi = min(3, mcq_options_count - 1)  # At least 2 correct, max 3 or options-1
         if multi_select_count > 0:
-            multi_select_instruction = f\"""
+            multi_select_instruction = f"""
         - {multi_select_count} Multi-Select MCQ (questions with multiple correct answers) - {mcq_marks} marks each
           ⚠️ For multi-select MCQs: Set "is_multi_select": true and provide "correct_answers" as an array of indices (e.g., [0, 2])
-          Multi-select questions should have 2-{min_correct_for_multi} correct options out of {mcq_options_count}.\"""
+          Multi-select questions should have 2-{min_correct_for_multi} correct options out of {mcq_options_count}."""
 
         # Generate dynamic option letters and example options based on mcq_options_count
         option_letters = ['A', 'B', 'C', 'D', 'E', 'F'][:mcq_options_count]
@@ -576,7 +576,7 @@ class GroqAnalyzer:
         valid_indices = ', '.join([str(i) for i in range(mcq_options_count)])
         example_correct_indices = [0, min(2, mcq_options_count - 1)]  # First and third (or last) option
 
-        prompt = f\"""
+        prompt = f"""
         Create an exam section for {display_section_name} SKILLS for the position of {position} in the {department} department.
 
         {language_instruction}
@@ -662,14 +662,14 @@ class GroqAnalyzer:
         5. Each MCQ MUST have exactly {mcq_options_count} options - no more, no less.
 
         Return only the JSON array, no additional text or formatting.
-        \"""
+        """
         
         return prompt
 
     def _get_section_description(self, section_type: str, department: str, position: str, section_config: Dict = None) -> str:
         """Get section description based on type, with support for custom sections"""
         descriptions = {
-            'technical': f\"""
+            'technical': f"""
             Technical skills and knowledge specific to {position} in {department}:
             - Programming concepts, algorithms, and data structures
             - System design and architecture
@@ -677,8 +677,8 @@ class GroqAnalyzer:
             - Tools and technologies used in {department}
             - Problem-solving scenarios relevant to {position}
             - Current trends and challenges in {department}
-            \""",
-            'english': \"""
+            """,
+            'english': """
             English Language Proficiency:
             - Grammar and sentence structure
             - Vocabulary and word usage
@@ -686,8 +686,8 @@ class GroqAnalyzer:
             - Writing skills and communication
             - Business English and professional communication
             - Spelling and punctuation
-            \""",
-            'mathematics': \"""
+            """,
+            'mathematics': """
             Mathematics and Quantitative Skills:
             - Basic arithmetic and algebra
             - Statistics and probability
@@ -695,8 +695,8 @@ class GroqAnalyzer:
             - Data interpretation and analysis
             - Mathematical concepts relevant to the workplace
             - Numerical reasoning
-            \""",
-            'bengali': \"""
+            """,
+            'bengali': """
             Bengali Language Skills:
             - Grammar and sentence construction (ব্যাকরণ এবং বাক্য গঠন)
             - Vocabulary and comprehension (শব্দভাণ্ডার এবং বোধগম্যতা)
@@ -704,8 +704,8 @@ class GroqAnalyzer:
             - Translation skills (অনুবাদ দক্ষতা)
             - Professional Bengali communication (পেশাদার বাংলা যোগাযোগ)
             - Cultural and linguistic knowledge (সাংস্কৃতিক ও ভাষাগত জ্ঞান)
-            \""",
-            'general_knowledge': \"""
+            """,
+            'general_knowledge': """
             General Knowledge and Current Affairs:
             - Current events and news (local and international)
             - History, geography, and culture
@@ -713,28 +713,28 @@ class GroqAnalyzer:
             - Sports and entertainment
             - Government and politics
             - Business and economics basics
-            \""",
-            'logical_reasoning': \"""
+            """,
+            'logical_reasoning': """
             Logical Reasoning and Intelligence:
             - Pattern recognition and sequences
             - Analytical thinking and problem solving
             - Critical thinking skills
             - Decision making scenarios
             - Abstract reasoning
-            \"""
+            """
         }
 
         # Check if this is a custom section
         if section_config and section_config.get('is_custom'):
             display_name = section_config.get('display_name', 'Custom Section')
-            return f\"""
+            return f"""
             Custom Section: {display_name}
             This is a custom section for {position} in {department}.
             Generate questions based on the syllabus/requirements provided.
             Focus on practical knowledge and professional skills relevant to this custom topic.
-            \"""
+            """
 
-        return descriptions.get(section_type, f\"""
+        return descriptions.get(section_type, f"""
         Professional Skills for {position}:
         - Industry knowledge and best practices
         - Professional ethics and communication
@@ -742,7 +742,7 @@ class GroqAnalyzer:
         - Leadership and teamwork skills
         - Project management basics
         - Relevant subject matter expertise
-        \""")
+        """)
 
     def _get_section_context(self, section_type: str) -> str:
         """Get evaluation context for different sections"""

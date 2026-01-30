@@ -28,6 +28,10 @@ from utils import (
 )
 from db import db
 from evaluation_queue import init_evaluation_queue, get_evaluation_queue
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Get environment variables
 API_KEY = os.getenv("API_KEY")
