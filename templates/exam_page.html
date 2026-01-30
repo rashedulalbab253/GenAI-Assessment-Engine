@@ -1,0 +1,1889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ exam.title }} - In Progress</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .exam-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .exam-meta {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .timer {
+            background: rgba(255,255,255,0.2);
+            padding: 12px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .timer.warning {
+            background: rgba(239, 68, 68, 0.9);
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .progress-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .progress-bar {
+            background: #e5e7eb;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+        
+        .question-type-sections {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            border: 2px solid #e1e5e9;
+        }
+        
+        .type-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .type-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+        
+        .type-nav.current {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .type-icon {
+            font-size: 1.1rem;
+        }
+        
+        .question-navigation {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .nav-question {
+            width: 35px;
+            height: 35px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: white;
+            position: relative;
+        }
+        
+        .nav-question.answered {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+        
+        .nav-question.current {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .nav-question:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+        
+        .nav-question::after {
+            content: attr(data-type);
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #666;
+            background: white;
+            padding: 2px 4px;
+            border-radius: 3px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .nav-question:hover::after {
+            opacity: 1;
+        }
+        
+        .question-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f9ff 100%);
+            margin: -30px -30px 25px -30px;
+            padding: 20px 30px;
+            border-radius: 12px 12px 0 0;
+            border-bottom: 3px solid #e1e5e9;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .section-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            color: #667eea;
+            border: 3px solid #667eea;
+            font-size: 1rem;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.2);
+        }
+
+        .section-badge.custom-section {
+            color: #059669;
+            border-color: #10b981;
+            box-shadow: 0 3px 10px rgba(16, 185, 129, 0.2);
+        }
+
+        .section-icon {
+            font-size: 1.3rem;
+        }
+        
+        .section-description {
+            color: #4b5563;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-left: 15px;
+            font-style: italic;
+            flex: 1;
+        }
+        
+        /* Negative Marking Badge */
+        .negative-marking-badge {
+            background: #fef2f2;
+            border: 2px solid #ef4444;
+            color: #dc2626;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+        }
+        
+        .no-negative-badge {
+            background: #f0fdf4;
+            border: 2px solid #10b981;
+            color: #059669;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+        }
+        
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .question-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .question-info {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .question-title {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .question-meta-info {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .question-type {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .type-mcq {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .type-short {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .type-essay {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .question-marks {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        /* MCQ Negative Marking Warning */
+        .mcq-negative-warning {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .mcq-negative-warning .warning-icon {
+            color: #dc2626;
+            font-size: 1.2rem;
+        }
+        
+        .mcq-negative-warning .warning-text {
+            color: #991b1b;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .question-text {
+            font-size: 1.2rem;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        /* Question Images Display */
+        .question-images {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            border: 2px solid #e1e5e9;
+        }
+        
+        .question-images-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .question-image-item {
+            text-align: center;
+            max-width: 500px;
+        }
+        
+        .question-image-item img {
+            max-width: 100%;
+            height: auto;
+            max-height: 400px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .question-image-item img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .image-caption {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #4b5563;
+            font-style: italic;
+            font-weight: 500;
+        }
+        
+        .options-container {
+            margin-bottom: 20px;
+        }
+        
+        .option {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .option.selected {
+            border-color: #667eea;
+            background: #f0f9ff;
+        }
+        
+        .option input[type="radio"],
+        .option input[type="checkbox"] {
+            margin-right: 15px;
+            margin-top: 2px;
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+
+        /* Multi-select indicator styling */
+        .multi-select-indicator {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 2px solid #10b981;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .multi-select-indicator .indicator-icon {
+            font-size: 1.2rem;
+        }
+
+        .multi-select-indicator .indicator-text {
+            color: #065f46;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .multi-select-indicator .indicator-hint {
+            color: #059669;
+            font-size: 0.85rem;
+            margin-left: auto;
+        }
+        
+        .option-label {
+            font-weight: 600;
+            color: #667eea;
+            min-width: 30px;
+        }
+        
+        .option-text {
+            flex: 1;
+            color: #333;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        
+        .answer-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+        
+        .answer-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .answer-textarea.essay {
+            min-height: 250px;
+        }
+        
+        .answer-info {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background: #f0f9ff;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .answer-info p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #1e40af;
+            line-height: 1.5;
+        }
+        
+        .question-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .save-indicator {
+            color: #10b981;
+            font-size: 0.9rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .save-indicator.show {
+            opacity: 1;
+        }
+        
+        .submit-section {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .submit-section h3 {
+            color: #1e40af;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .submit-section p {
+            color: #475569;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .question-type-summary {
+            background: #f0f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .type-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .type-summary-item {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .type-summary-count {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .clear-selection-container {
+            border-top: 1px solid #e5e7eb;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+        
+        .clear-selection-btn {
+            background: #f87171;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+        
+        .clear-selection-btn:hover {
+            background: #ef4444;
+            opacity: 1;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        }
+        
+        .clear-selection-btn:disabled {
+            background: #d1d5db;
+            color: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.5;
+        }
+        
+        /* Section-specific styling */
+        .section-technical { border-left: 5px solid #667eea; }
+        .section-english { border-left: 5px solid #10b981; }
+        .section-mathematics { border-left: 5px solid #f59e0b; }
+        .section-bengali { border-left: 5px solid #ef4444; }
+        .section-general_knowledge { border-left: 5px solid #8b5cf6; }
+        .section-logical_reasoning { border-left: 5px solid #06b6d4; }
+
+        /* Loading Overlay Styles */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(102, 126, 234, 0.95);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+            max-width: 500px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 8px solid rgba(255, 255, 255, 0.3);
+            border-top: 8px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 30px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .loading-message {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .loading-steps {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .loading-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .loading-step.active {
+            opacity: 1;
+            color: #fbbf24;
+        }
+
+        .loading-step.completed {
+            opacity: 1;
+            color: #10b981;
+        }
+
+        .loading-progress {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .loading-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #fbbf24);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .timer {
+                font-size: 1rem;
+                padding: 10px 15px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .question-section {
+                padding: 20px;
+            }
+            
+            .section-header {
+                margin: -20px -20px 20px -20px;
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .question-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .question-actions {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .question-type-sections,
+            .question-navigation {
+                justify-content: center;
+            }
+            
+            .type-summary-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .negative-marking-badge,
+            .no-negative-badge {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+
+            .loading-content {
+                padding: 30px 20px;
+                margin: 20px;
+                max-width: 90%;
+            }
+
+            .loading-title {
+                font-size: 1.5rem;
+            }
+
+            .loading-spinner {
+                width: 60px;
+                height: 60px;
+                border-width: 6px;
+            }
+            
+            .question-images-container {
+                flex-direction: column;
+            }
+            
+            .question-image-item {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h2 class="loading-title">🎯 Submitting Your Exam</h2>
+            <p class="loading-message">Please wait while we process your answers and evaluate your responses. This may take a few moments.</p>
+            
+            <div class="loading-steps">
+                <div class="loading-step completed" id="step1">
+                    <span>✅</span>
+                    <span>Answers submitted successfully</span>
+                </div>
+                <div class="loading-step active" id="step2">
+                    <span>🤖</span>
+                    <span>AI is evaluating your responses...</span>
+                </div>
+                <div class="loading-step" id="step3">
+                    <span>📊</span>
+                    <span>Calculating final scores</span>
+                </div>
+                <div class="loading-step" id="step4">
+                    <span>🎉</span>
+                    <span>Preparing your results</span>
+                </div>
+            </div>
+
+            <div class="loading-progress">
+                <div class="loading-progress-bar" id="loadingProgressBar"></div>
+            </div>
+
+            <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.8;">
+                <strong>Important:</strong> Please do not close this window or navigate away. Your results will be displayed shortly.
+            </p>
+        </div>
+    </div>
+
+    <div class="header">
+        <div class="header-content">
+            <div>
+                <div class="exam-title">{{ exam.title }}</div>
+                <div class="exam-meta">{{ candidate_name }} ({{ candidate_id }})</div>
+            </div>
+            <div class="timer" id="examTimer">
+                <span>⏰</span>
+                <span id="timeDisplay">{{ exam.time_limit }}:00</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Progress Section -->
+        <div class="progress-section">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text">
+                <span>Progress: <span id="answeredCount">0</span> of {{ questions|length }} questions answered</span>
+                <span id="saveIndicator" class="save-indicator">✔ Auto-saved</span>
+            </div>
+            
+            <!-- Question Type Summary -->
+            <div class="question-type-summary">
+                <h4 style="color: #1e40af; margin-bottom: 10px;">📊 Question Types</h4>
+                <div class="type-summary-grid">
+                    <div class="type-summary-item">
+                        <div class="type-summary-count" id="mcqCount">0</div>
+                        <div class="type-summary-label">Multiple Choice</div>
+                    </div>
+                    <div class="type-summary-item">
+                        <div class="type-summary-count" id="shortCount">0</div>
+                        <div class="type-summary-label">Short Answer</div>
+                    </div>
+                    <div class="type-summary-item">
+                        <div class="type-summary-count" id="essayCount">0</div>
+                        <div class="type-summary-label">Essay Questions</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question Type Navigation -->
+            <div class="question-type-sections" id="typeNav">
+                <div class="type-nav current" data-type="mcq" onclick="goToQuestionType('mcq')">
+                    <span class="type-icon">☑️</span>
+                    <span>Multiple Choice</span>
+                </div>
+                <div class="type-nav" data-type="short" onclick="goToQuestionType('short')">
+                    <span class="type-icon">✏️</span>
+                    <span>Short Answer</span>
+                </div>
+                <div class="type-nav" data-type="essay" onclick="goToQuestionType('essay')">
+                    <span class="type-icon">📝</span>
+                    <span>Essay Questions</span>
+                </div>
+            </div>
+            
+            <div class="question-navigation" id="questionNav">
+                {% for question in questions %}
+                <div class="nav-question" 
+                     data-question="{{ loop.index0 }}" 
+                     data-type="{{ question.type.upper() }}"
+                     onclick="goToQuestion({{ loop.index0 }})">
+                    {{ loop.index }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Question Section -->
+        <form method="POST" action="/exam/submit" id="examForm">
+            <input type="hidden" name="session_id" value="{{ session_id }}">
+            <input type="hidden" name="time_taken" id="timeTakenInput">
+            
+            {% for question in questions %}
+            {% set section_config = exam.sections_structure.get(question.section_type, {}) if exam.sections_structure else {} %}
+            {% set is_custom = section_config.get('is_custom', false) %}
+            {% set custom_name = section_config.get('display_name', 'Custom Section') if is_custom else '' %}
+            {% set custom_icon = section_config.get('icon', '📚') if is_custom else '' %}
+            <div class="question-section section-{{ question.section_type }}" id="question{{ loop.index0 }}" style="{% if loop.index0 != 0 %}display: none;{% endif %}">
+                <!-- Section Header -->
+                <div class="section-header">
+                    <div class="section-badge{% if is_custom %} custom-section{% endif %}">
+                        <span class="section-icon">
+                            {% if is_custom %}{{ custom_icon }}
+                            {% elif question.section_type == 'technical' %}⚙️
+                            {% elif question.section_type == 'english' %}🇬🇧
+                            {% elif question.section_type == 'mathematics' %}🔢
+                            {% elif question.section_type == 'bengali' %}🇧🇩
+                            {% elif question.section_type == 'general_knowledge' %}🌍
+                            {% elif question.section_type == 'logical_reasoning' %}🧠
+                            {% else %}📝{% endif %}
+                        </span>
+                        <span>{% if is_custom %}{{ custom_name }}{% else %}{{ question.section_type.replace('_', ' ').title() }}{% endif %} Section</span>
+                    </div>
+                    <div class="section-description">
+                        {% if is_custom %}
+                            Custom assessment section
+                        {% elif question.section_type == 'technical' %}
+                            Technical knowledge and job-specific skills
+                        {% elif question.section_type == 'english' %}
+                            English language proficiency and communication
+                        {% elif question.section_type == 'mathematics' %}
+                            Mathematical reasoning and problem solving
+                        {% elif question.section_type == 'bengali' %}
+                            Bengali language skills and cultural knowledge
+                        {% elif question.section_type == 'general_knowledge' %}
+                            Current affairs and general awareness
+                        {% elif question.section_type == 'logical_reasoning' %}
+                            Logical thinking and analytical reasoning
+                        {% else %}
+                            Assessment questions
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Negative Marking Badge -->
+                    {% if exam.negative_marking_config and exam.negative_marking_config.get(question.section_type) %}
+                        {% if exam.negative_marking_config[question.section_type].get('enabled') and question.type == 'mcq' %}
+                        <div class="negative-marking-badge">
+                            <span>⚠️</span>
+                            <span>-{{ exam.negative_marking_config[question.section_type].get('mcq_negative_marks', 0) }} for wrong MCQ</span>
+                        </div>
+                        {% elif question.type == 'mcq' %}
+                        <div class="no-negative-badge">
+                            <span>✅</span>
+                            <span>No Negative Marking</span>
+                        </div>
+                        {% endif %}
+                    {% elif question.type == 'mcq' %}
+                    <div class="no-negative-badge">
+                        <span>✅</span>
+                        <span>No Negative Marking</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="question-header">
+                    <div class="question-number">{{ loop.index }}</div>
+                    <div class="question-info">
+                        <div class="question-title">Question {{ loop.index }} of {{ questions|length }}</div>
+                        <div class="question-meta-info">
+                            <span class="question-type type-{{ question.type }}">{{ question.type.upper() }}</span>
+                            <span class="question-marks">{{ question.marks }} marks</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- MCQ Negative Marking Warning -->
+                {% if question.type == 'mcq' and exam.negative_marking_config and exam.negative_marking_config.get(question.section_type) and exam.negative_marking_config[question.section_type].get('enabled') %}
+                <div class="mcq-negative-warning">
+                    <span class="warning-icon">⚠️</span>
+                    <span class="warning-text">
+                        Careful! Wrong answers will deduct {{ exam.negative_marking_config[question.section_type].get('mcq_negative_marks', 0) }} marks. 
+                        Consider leaving blank if unsure.
+                    </span>
+                </div>
+                {% endif %}
+                
+                <div class="question-text">{{ question.question }}</div>
+                
+                <!-- Display Question Images if they exist -->
+                {% if question.image_url or (question.images and question.images|length > 0) %}
+                <div class="question-images">
+                    <div class="question-images-container">
+                        {% if question.image_url %}
+                        <div class="question-image-item">
+                            <img src="{{ question.image_url }}" 
+                                 alt="Figure for Question {{ loop.index }}" 
+                                 onclick="window.open('{{ question.image_url }}', '_blank')"
+                                 title="Click to view full size">
+                            {% if question.image_caption %}
+                            <div class="image-caption">{{ question.image_caption }}</div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if question.images %}
+                            {% for image in question.images %}
+                            <div class="question-image-item">
+                                <img src="{{ image.url }}" 
+                                     alt="Figure {{ loop.index }} for Question" 
+                                     onclick="window.open('{{ image.url }}', '_blank')"
+                                     title="Click to view full size">
+                                {% if image.caption %}
+                                <div class="image-caption">{{ image.caption }}</div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if question.type == 'mcq' %}
+                <div class="options-container" data-multi-select="{{ 'true' if question.is_multi_select else 'false' }}">
+                    {% if question.is_multi_select %}
+                    <!-- Multi-select MCQ indicator -->
+                    <div class="multi-select-indicator">
+                        <span class="indicator-icon">☑️☑️</span>
+                        <span class="indicator-text">Multiple answers may be correct. Select all that apply.</span>
+                        <span class="indicator-hint">You can select more than one option</span>
+                    </div>
+                    {% endif %}
+
+                    {% for option in question.options %}
+                    {% if question.is_multi_select %}
+                    <div class="option" onclick="selectMultiOption(this, {{ loop.index0 }})">
+                        <input type="checkbox" name="question_{{ question.id }}" value="{{ loop.index0 }}"
+                               id="q{{ question.id }}_{{ loop.index0 }}">
+                        <span class="option-label">{{ ['A', 'B', 'C', 'D', 'E', 'F'][loop.index0] }})</span>
+                        <span class="option-text">{{ option }}</span>
+                    </div>
+                    {% else %}
+                    <div class="option" onclick="selectOption(this, {{ loop.index0 }})">
+                        <input type="radio" name="question_{{ question.id }}" value="{{ loop.index0 }}"
+                               id="q{{ question.id }}_{{ loop.index0 }}">
+                        <span class="option-label">{{ ['A', 'B', 'C', 'D', 'E', 'F'][loop.index0] }})</span>
+                        <span class="option-text">{{ option }}</span>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+
+                    <!-- Clear Selection Button -->
+                    <div class="clear-selection-container" style="margin-top: 15px; text-align: center;">
+                        <button type="button" class="clear-selection-btn" onclick="clearMCQSelection('question_{{ question.id }}', {{ 'true' if question.is_multi_select else 'false' }})">
+                            🗑️ Clear Selection
+                        </button>
+                    </div>
+                </div>
+                {% else %}
+                <div>
+                    <textarea 
+                        name="question_{{ question.id }}" 
+                        class="answer-textarea {% if question.type == 'essay' %}essay{% endif %}"
+                        placeholder="Type your answer here..."
+                        onInput="handleTextareaInput();"
+                        data-question="{{ loop.index0 }}"></textarea>
+                    
+                    {% if question.type == 'short' %}
+                    <div class="answer-info">
+                        <p><strong>💡 Short Answer Guidelines:</strong> Provide a concise and direct answer. Focus on key points and be specific.</p>
+                    </div>
+                    {% elif question.type == 'essay' %}
+                    <div class="answer-info">
+                        <p><strong>📝 Essay Guidelines:</strong> Write a comprehensive answer with clear structure. Include introduction, main points with examples, and conclusion. Take your time to develop your thoughts fully.</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <div class="question-actions">
+                    <button type="button" class="btn btn-secondary" onclick="previousQuestion()" 
+                            {% if loop.index0 == 0 %}disabled{% endif %}>
+                        ← Previous
+                    </button>
+                    
+                    <div style="display: flex; gap: 15px;">
+                        {% if loop.index0 == questions|length - 1 %}
+                        <button type="button" class="btn btn-success" onclick="showSubmitConfirmation()">
+                            🎯 Finish & Review
+                        </button>
+                        {% else %}
+                        <button type="button" class="btn btn-primary" onclick="nextQuestion()">
+                            Next →
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <!-- Submit Section -->
+            <div class="submit-section" id="submitSection" style="display: none;">
+                <h3>🎯 Ready to Submit?</h3>
+                <p>Please review your answers before final submission. Once submitted, you cannot make any changes.</p>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-secondary" onclick="hideSubmitConfirmation()">
+                        ← Review Answers
+                    </button>
+                    <button type="submit" class="btn btn-success" onclick="return confirmSubmit()">
+                        ✅ Submit Final Answers
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        let currentQuestion = 0;
+        let totalQuestions = {{ questions|length }};
+        let timeLimit = {{ exam.time_limit }}; // minutes
+        let startTime = new Date();
+        let examTimer;
+        let isSubmitting = false;
+        
+        // Question type data
+        const questionTypes = {
+            {% set mcq_questions = questions | selectattr('type', 'equalto', 'mcq') | list %}
+            {% set short_questions = questions | selectattr('type', 'equalto', 'short') | list %}
+            {% set essay_questions = questions | selectattr('type', 'equalto', 'essay') | list %}
+            'mcq': {
+                questions: [{% for q in mcq_questions %}{{ loop.index0 + questions.index(q) }}{% if not loop.last %},{% endif %}{% endfor %}],
+                count: {{ mcq_questions|length }}
+            },
+            'short': {
+                questions: [{% for q in short_questions %}{{ loop.index0 + questions.index(q) }}{% if not loop.last %},{% endif %}{% endfor %}],
+                count: {{ short_questions|length }}
+            },
+            'essay': {
+                questions: [{% for q in essay_questions %}{{ loop.index0 + questions.index(q) }}{% if not loop.last %},{% endif %}{% endfor %}],
+                count: {{ essay_questions|length }}
+            }
+        };
+        
+        // Create a mapping from question ID to question index for easier lookup
+        const questionIdToIndex = {};
+        {% for question in questions %}
+        questionIdToIndex['{{ question.id }}'] = {{ loop.index0 }};
+        {% endfor %}
+        
+        // Timer functionality
+        function updateTimer() {
+            const now = new Date();
+            const elapsed = Math.floor((now - startTime) / 1000);
+            const remaining = (timeLimit * 60) - elapsed;
+            
+            if (remaining <= 0 && !isSubmitting) {
+                // Auto-submit when time is up
+                autoSubmitExam();
+                return;
+            }
+            
+            const minutes = Math.floor(remaining / 60);
+            const seconds = remaining % 60;
+            const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            document.getElementById('timeDisplay').textContent = timeString;
+            document.getElementById('timeTakenInput').value = `${Math.floor(elapsed / 60).toString().padStart(2, '0')}:${(elapsed % 60).toString().padStart(2, '0')}`;
+            
+            // Warning when 5 minutes left
+            if (remaining <= 300) {
+                document.getElementById('examTimer').classList.add('warning');
+            }
+        }
+
+        // Auto-submit function when time is up
+        function autoSubmitExam() {
+            if (isSubmitting) return;
+            
+            isSubmitting = true;
+            clearInterval(examTimer);
+            
+            // Show loading overlay immediately
+            showLoadingOverlay();
+            
+            // Submit the form
+            setTimeout(() => {
+                document.getElementById('examForm').submit();
+            }, 1000);
+        }
+
+        // Loading overlay functions
+        function showLoadingOverlay() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            simulateLoadingProgress();
+        }
+
+        function simulateLoadingProgress() {
+            const progressBar = document.getElementById('loadingProgressBar');
+            const steps = ['step1', 'step2', 'step3', 'step4'];
+            let currentStep = 0;
+            let progress = 25; // Start at 25% since step 1 is already completed
+
+            progressBar.style.width = '25%';
+
+            const progressInterval = setInterval(() => {
+                if (currentStep < steps.length - 1) {
+                    // Mark current step as completed
+                    const currentStepEl = document.getElementById(steps[currentStep + 1]);
+                    if (currentStepEl) {
+                        currentStepEl.classList.remove('active');
+                        currentStepEl.classList.add('completed');
+                        currentStepEl.querySelector('span').textContent = '✅';
+                    }
+
+                    // Activate next step
+                    if (currentStep + 2 < steps.length) {
+                        const nextStepEl = document.getElementById(steps[currentStep + 2]);
+                        if (nextStepEl) {
+                            nextStepEl.classList.add('active');
+                        }
+                    }
+
+                    currentStep++;
+                    progress += 25;
+                    progressBar.style.width = progress + '%';
+                } else {
+                    clearInterval(progressInterval);
+                    // Keep showing loading until page actually navigates
+                }
+            }, 2000);
+        }
+        
+        // Start timer
+        examTimer = setInterval(updateTimer, 1000);
+        updateTimer();
+        
+        // Question type navigation
+        function goToQuestionType(type) {
+            if (questionTypes[type] && questionTypes[type].questions.length > 0) {
+                const firstQuestionIndex = questionTypes[type].questions[0];
+                goToQuestion(firstQuestionIndex);
+                updateTypeNavigation(type);
+            }
+        }
+        
+        function updateTypeNavigation(activeType) {
+            const typeNavs = document.querySelectorAll('.type-nav');
+            typeNavs.forEach(nav => {
+                nav.classList.remove('current');
+                if (nav.getAttribute('data-type') === activeType) {
+                    nav.classList.add('current');
+                }
+            });
+        }
+        
+        function getCurrentQuestionType() {
+            const questionElement = document.getElementById(`question${currentQuestion}`);
+            const typeElement = questionElement.querySelector('.question-type');
+            if (typeElement) {
+                const typeText = typeElement.textContent.toLowerCase();
+                if (typeText.includes('mcq')) return 'mcq';
+                if (typeText.includes('short')) return 'short';
+                if (typeText.includes('essay')) return 'essay';
+            }
+            return 'mcq'; // fallback
+        }
+        
+        // Question navigation
+        function goToQuestion(questionIndex) {
+            // Hide current question
+            document.getElementById(`question${currentQuestion}`).style.display = 'none';
+            
+            // Show target question
+            document.getElementById(`question${questionIndex}`).style.display = 'block';
+            
+            // Update navigation
+            updateQuestionNavigation(questionIndex);
+            
+            // Update type navigation
+            const currentType = getCurrentQuestionType();
+            updateTypeNavigation(currentType);
+            
+            currentQuestion = questionIndex;
+            updateProgress();
+        }
+        
+        function nextQuestion() {
+            if (currentQuestion < totalQuestions - 1) {
+                goToQuestion(currentQuestion + 1);
+            }
+        }
+        
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                goToQuestion(currentQuestion - 1);
+            }
+        }
+        
+        function updateQuestionNavigation(activeIndex) {
+            const navItems = document.querySelectorAll('.nav-question');
+            navItems.forEach((item, index) => {
+                item.classList.remove('current');
+                if (index === activeIndex) {
+                    item.classList.add('current');
+                }
+            });
+        }
+        
+        // Option selection for single-answer MCQ - Updated to handle deselection
+        function selectOption(optionDiv, optionValue) {
+            const radio = optionDiv.querySelector('input[type="radio"]');
+            const questionContainer = optionDiv.closest('.question-section');
+            const allOptions = questionContainer.querySelectorAll('.option');
+            const clearBtn = questionContainer.querySelector('.clear-selection-btn');
+
+            // Check if this option is already selected
+            if (radio.checked) {
+                // If already selected, allow deselection by clicking again
+                radio.checked = false;
+                optionDiv.classList.remove('selected');
+                allOptions.forEach(opt => opt.classList.remove('selected'));
+
+                // Disable clear button since nothing is selected
+                if (clearBtn) {
+                    clearBtn.disabled = true;
+                    clearBtn.style.opacity = '0.5';
+                }
+            } else {
+                // Select this option
+                radio.checked = true;
+
+                // Update visual selection
+                allOptions.forEach(opt => opt.classList.remove('selected'));
+                optionDiv.classList.add('selected');
+
+                // Enable clear button
+                if (clearBtn) {
+                    clearBtn.disabled = false;
+                    clearBtn.style.opacity = '0.7';
+                }
+            }
+
+            updateProgress();
+            autoSave();
+        }
+
+        // Option selection for multi-select MCQ (checkboxes)
+        function selectMultiOption(optionDiv, optionValue) {
+            const checkbox = optionDiv.querySelector('input[type="checkbox"]');
+            const questionContainer = optionDiv.closest('.question-section');
+            const allCheckboxes = questionContainer.querySelectorAll('input[type="checkbox"]');
+            const clearBtn = questionContainer.querySelector('.clear-selection-btn');
+
+            // Toggle the checkbox
+            checkbox.checked = !checkbox.checked;
+
+            // Update visual selection
+            if (checkbox.checked) {
+                optionDiv.classList.add('selected');
+            } else {
+                optionDiv.classList.remove('selected');
+            }
+
+            // Check if any checkbox is selected to enable/disable clear button
+            let anySelected = false;
+            allCheckboxes.forEach(cb => {
+                if (cb.checked) anySelected = true;
+            });
+
+            if (clearBtn) {
+                clearBtn.disabled = !anySelected;
+                clearBtn.style.opacity = anySelected ? '0.7' : '0.5';
+            }
+
+            updateProgress();
+            autoSave();
+        }
+
+        // Clear MCQ selection function - handles both radio and checkbox
+        function clearMCQSelection(questionName, isMultiSelect) {
+            // Find all inputs for this question (radio buttons or checkboxes)
+            const inputs = document.querySelectorAll(`input[name="${questionName}"]`);
+            const questionContainer = document.querySelector(`input[name="${questionName}"]`).closest('.question-section');
+            const allOptions = questionContainer.querySelectorAll('.option');
+            const clearBtn = questionContainer.querySelector('.clear-selection-btn');
+
+            // Uncheck all inputs (works for both radio and checkbox)
+            inputs.forEach(input => {
+                input.checked = false;
+            });
+
+            // Remove selected styling from all options
+            allOptions.forEach(opt => opt.classList.remove('selected'));
+
+            // Disable clear button
+            if (clearBtn) {
+                clearBtn.disabled = true;
+                clearBtn.style.opacity = '0.5';
+            }
+
+            // Update progress and auto-save
+            updateProgress();
+            autoSave();
+
+            // Show confirmation
+            showTemporaryMessage('✅ Selection cleared successfully!');
+        }
+        
+        // Show temporary message function
+        function showTemporaryMessage(message) {
+            // Create or update the message element
+            let messageEl = document.getElementById('tempMessage');
+            if (!messageEl) {
+                messageEl = document.createElement('div');
+                messageEl.id = 'tempMessage';
+                messageEl.style.cssText = `
+                    position: fixed;
+                    top: 100px;
+                    right: 20px;
+                    background: #10b981;
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    z-index: 1000;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                `;
+                document.body.appendChild(messageEl);
+            }
+            
+            messageEl.textContent = message;
+            messageEl.style.opacity = '1';
+            
+            // Hide after 2 seconds
+            setTimeout(() => {
+                messageEl.style.opacity = '0';
+                setTimeout(() => {
+                    if (messageEl.parentNode) {
+                        messageEl.parentNode.removeChild(messageEl);
+                    }
+                }, 300);
+            }, 2000);
+        }
+        
+        // Handle textarea input for short and essay questions
+        function handleTextareaInput() {
+            updateProgress();
+            autoSave();
+        }
+        
+        // Progress tracking
+        function updateProgress() {
+            let answeredCount = 0;
+
+            // Get all form inputs (radio buttons, checkboxes, and textareas)
+            const allInputs = document.querySelectorAll('input[name^="question_"], textarea[name^="question_"]');
+
+            // Group inputs by question name to handle radio/checkbox groups correctly
+            const questionGroups = {};
+            allInputs.forEach(input => {
+                const questionName = input.name;
+                if (!questionGroups[questionName]) {
+                    questionGroups[questionName] = [];
+                }
+                questionGroups[questionName].push(input);
+            });
+
+            // Check each question group to see if it's answered
+            const answeredQuestionIndices = new Set();
+
+            Object.keys(questionGroups).forEach(questionName => {
+                const inputs = questionGroups[questionName];
+                let isAnswered = false;
+
+                // Check if any radio/checkbox in the group is checked, or if textarea has content
+                inputs.forEach(input => {
+                    if ((input.type === 'radio' || input.type === 'checkbox') && input.checked) {
+                        isAnswered = true;
+                    } else if (input.type !== 'radio' && input.type !== 'checkbox' && input.value.trim() !== '') {
+                        isAnswered = true;
+                    }
+                });
+
+                if (isAnswered) {
+                    answeredCount++;
+
+                    // Find the question index for this question name
+                    const questionId = questionName.replace('question_', '');
+                    const questionIndex = questionIdToIndex[questionId];
+                    if (questionIndex !== undefined) {
+                        answeredQuestionIndices.add(questionIndex);
+                    }
+                }
+            });
+            
+            // Update progress bar
+            const percentage = (answeredCount / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('answeredCount').textContent = answeredCount;
+            
+            // Update question navigation styling
+            updateAnsweredStatus(answeredQuestionIndices);
+        }
+        
+        function updateAnsweredStatus(answeredQuestionIndices) {
+            // Update navigation styling
+            const navItems = document.querySelectorAll('.nav-question');
+            navItems.forEach((item, index) => {
+                item.classList.remove('answered');
+                if (answeredQuestionIndices.has(index)) {
+                    item.classList.add('answered');
+                }
+            });
+        }
+        
+        // Auto-save functionality
+        function autoSave() {
+            const formData = new FormData(document.getElementById('examForm'));
+            const answers = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (key.startsWith('question_')) {
+                    answers[key] = value;
+                }
+            }
+            
+            localStorage.setItem('exam_answers_{{ session_id }}', JSON.stringify(answers));
+            
+            // Show save indicator
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => indicator.classList.remove('show'), 2000);
+        }
+        
+        // Load saved answers - handles radio, checkbox, and textarea
+        function loadSavedAnswers() {
+            const saved = localStorage.getItem('exam_answers_{{ session_id }}');
+            if (saved) {
+                const answers = JSON.parse(saved);
+
+                // Group answers by question name (for multi-select which may have multiple values)
+                const groupedAnswers = {};
+                for (let [key, value] of Object.entries(answers)) {
+                    if (!groupedAnswers[key]) {
+                        groupedAnswers[key] = [];
+                    }
+                    groupedAnswers[key].push(value);
+                }
+
+                for (let [key, values] of Object.entries(groupedAnswers)) {
+                    const firstInput = document.querySelector(`[name="${key}"]`);
+                    if (firstInput) {
+                        if (firstInput.type === 'radio') {
+                            // Single-select MCQ (radio button)
+                            const radioInput = document.querySelector(`[name="${key}"][value="${values[0]}"]`);
+                            if (radioInput) {
+                                radioInput.checked = true;
+                                radioInput.closest('.option').classList.add('selected');
+
+                                // Enable clear button for this question
+                                const questionContainer = radioInput.closest('.question-section');
+                                const clearBtn = questionContainer.querySelector('.clear-selection-btn');
+                                if (clearBtn) {
+                                    clearBtn.disabled = false;
+                                    clearBtn.style.opacity = '0.7';
+                                }
+                            }
+                        } else if (firstInput.type === 'checkbox') {
+                            // Multi-select MCQ (checkboxes)
+                            values.forEach(value => {
+                                const checkboxInput = document.querySelector(`[name="${key}"][value="${value}"]`);
+                                if (checkboxInput) {
+                                    checkboxInput.checked = true;
+                                    checkboxInput.closest('.option').classList.add('selected');
+                                }
+                            });
+
+                            // Enable clear button for this question
+                            const questionContainer = firstInput.closest('.question-section');
+                            const clearBtn = questionContainer.querySelector('.clear-selection-btn');
+                            if (clearBtn) {
+                                clearBtn.disabled = false;
+                                clearBtn.style.opacity = '0.7';
+                            }
+                        } else {
+                            // Textarea (short/essay)
+                            firstInput.value = values[0];
+                        }
+                    }
+                }
+                updateProgress();
+            }
+
+            // Initialize clear button states for all MCQ questions
+            initializeClearButtonStates();
+        }
+        
+        // Initialize clear button states - handles both radio and checkbox
+        function initializeClearButtonStates() {
+            const allClearBtns = document.querySelectorAll('.clear-selection-btn');
+            allClearBtns.forEach(btn => {
+                const questionContainer = btn.closest('.question-section');
+                const inputs = questionContainer.querySelectorAll('input[type="radio"], input[type="checkbox"]');
+                const hasSelection = Array.from(inputs).some(input => input.checked);
+
+                if (hasSelection) {
+                    btn.disabled = false;
+                    btn.style.opacity = '0.7';
+                } else {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+                }
+            });
+        }
+        
+        // Submit confirmation
+        function showSubmitConfirmation() {
+            // Hide current question
+            document.getElementById(`question${currentQuestion}`).style.display = 'none';
+            
+            // Show submit section
+            document.getElementById('submitSection').style.display = 'block';
+            
+            // Update navigation to show we're at submit
+            const navItems = document.querySelectorAll('.nav-question, .type-nav');
+            navItems.forEach(item => item.classList.remove('current'));
+        }
+        
+        function hideSubmitConfirmation() {
+            // Hide submit section
+            document.getElementById('submitSection').style.display = 'none';
+            
+            // Show last question
+            goToQuestion(totalQuestions - 1);
+        }
+        
+        function confirmSubmit() {
+            if (isSubmitting) return false;
+            
+            const formData = new FormData(document.getElementById('examForm'));
+            let answeredCount = 0;
+            const questionNames = new Set();
+            
+            // Count answered questions
+            const questionInputs = document.querySelectorAll('input[name^="question_"], textarea[name^="question_"]');
+            questionInputs.forEach(input => {
+                questionNames.add(input.name);
+            });
+            
+            questionNames.forEach(name => {
+                const inputs = document.querySelectorAll(`[name="${name}"]`);
+                let hasAnswer = false;
+
+                inputs.forEach(input => {
+                    if ((input.type === 'radio' || input.type === 'checkbox') && input.checked) {
+                        hasAnswer = true;
+                    } else if (input.type !== 'radio' && input.type !== 'checkbox' && input.value.trim()) {
+                        hasAnswer = true;
+                    }
+                });
+                
+                if (hasAnswer) answeredCount++;
+            });
+            
+            const unanswered = totalQuestions - answeredCount;
+            
+            let confirmMessage = '🎯 Are you sure you want to submit your exam?\n\n';
+            confirmMessage += `📊 Summary:\n`;
+            confirmMessage += `- Answered: ${answeredCount} questions\n`;
+            if (unanswered > 0) {
+                confirmMessage += `- Unanswered: ${unanswered} questions\n`;
+            }
+            confirmMessage += `\n⚠️ Once submitted, you cannot make any changes.\n\nProceed with submission?`;
+            
+            if (confirm(confirmMessage)) {
+                isSubmitting = true;
+                clearInterval(examTimer);
+                showLoadingOverlay();
+                return true;
+            }
+            return false;
+        }
+        
+        function submitExam() {
+            if (isSubmitting) return;
+            isSubmitting = true;
+            clearInterval(examTimer);
+            showLoadingOverlay();
+            document.getElementById('examForm').submit();
+        }
+        
+        // Prevent accidental navigation
+        window.addEventListener('beforeunload', function(e) {
+            if (!isSubmitting) {
+                e.preventDefault();
+                e.returnValue = 'Are you sure you want to leave? Your exam progress will be lost.';
+            }
+        });
+        
+        // Disable right-click and some keyboard shortcuts
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            // Disable F12, Ctrl+Shift+I, Ctrl+U, etc.
+            if (e.keyCode === 123 || 
+                (e.ctrlKey && e.shiftKey && e.keyCode === 73) || 
+                (e.ctrlKey && e.keyCode === 85) ||
+                (e.ctrlKey && e.keyCode === 83)) {
+                e.preventDefault();
+            }
+        });
+        
+        // Add auto-save listeners
+        document.addEventListener('change', function(e) {
+            if (e.target.name && e.target.name.startsWith('question_')) {
+                updateProgress();
+                autoSave();
+            }
+        });
+        
+        document.addEventListener('input', function(e) {
+            if (e.target.name && e.target.name.startsWith('question_')) {
+                debounce(function() {
+                    updateProgress();
+                    autoSave();
+                }, 1000)();
+            }
+        });
+        
+        // Debounce function for auto-save
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('submitSection').style.display !== 'block') {
+                if (e.key === 'ArrowRight' && currentQuestion < totalQuestions - 1) {
+                    nextQuestion();
+                } else if (e.key === 'ArrowLeft' && currentQuestion > 0) {
+                    previousQuestion();
+                }
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update question type counts
+            document.getElementById('mcqCount').textContent = questionTypes.mcq.count;
+            document.getElementById('shortCount').textContent = questionTypes.short.count;
+            document.getElementById('essayCount').textContent = questionTypes.essay.count;
+            
+            loadSavedAnswers();
+            updateQuestionNavigation(0);
+            updateTypeNavigation(getCurrentQuestionType());
+            updateProgress();
+            initializeClearButtonStates();
+            
+            // Focus on first input
+            const firstInput = document.querySelector('#question0 input, #question0 textarea');
+            if (firstInput) {
+                firstInput.focus();
+            }
+            
+            console.log('🚀 Exam interface initialized with section information and negative marking');
+            console.log('📊 Question types:', questionTypes);
+            console.log('🔗 Question ID to Index mapping:', questionIdToIndex);
+            console.log('🖼️ Images loaded for questions with figures');
+        });
+        
+        // Cleanup on form submit - Modified to handle loading
+        document.getElementById('examForm').addEventListener('submit', function(e) {
+            if (!isSubmitting) {
+                e.preventDefault();
+                return false;
+            }
+            
+            clearInterval(examTimer);
+            localStorage.removeItem('exam_answers_{{ session_id }}');
+            
+            // Show loading state
+            const submitButtons = document.querySelectorAll('button[type="submit"]');
+            submitButtons.forEach(btn => {
+                btn.disabled = true;
+                btn.textContent = '📄 Submitting...';
+            });
+        });
+    </script>
+</body>
+</html>

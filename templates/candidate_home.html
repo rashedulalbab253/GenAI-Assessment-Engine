@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Exam System</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .header {
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+        
+        .exam-access {
+            background: #f8f9ff;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 30px 0;
+        }
+        
+        .exam-access h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+        
+        .feature:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .feature h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .feature p {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .contact-info {
+            background: #fef2f2;
+            border: 2px solid #fecaca;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .contact-info h3 {
+            color: #dc2626;
+            margin-bottom: 10px;
+        }
+        
+        .contact-info p {
+            color: #991b1b;
+            margin-bottom: 5px;
+        }
+        
+        .admin-link {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .admin-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .admin-link {
+                position: static;
+                margin-bottom: 20px;
+                display: inline-block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/admin/login" class="admin-link">🔧 Admin Login</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>📋 Online Exam System</h1>
+            <p>Secure and reliable online examination platform for candidates</p>
+        </div>
+        
+        <div class="exam-access">
+            <h2>🚀 Access Your Exam</h2>
+            {% if error %}
+            <div style="background: #fee2e2; color: #dc2626; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ef4444;">
+                <strong>❌ Error:</strong> {{ error }}
+            </div>
+            {% endif %}
+            <form action="/exam/check" method="GET">
+                <div class="form-group">
+                    <label for="exam_code">📝 Enter Exam Link or Code</label>
+                    <input type="text" id="exam_code" name="exam_code" required 
+                           placeholder="Enter your exam link or code">
+                </div>
+                <button type="button" class="btn" onclick="accessExam()">
+                    🎯 Access Exam
+                </button>
+            </form>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">⏱️</div>
+                <h3>Timed Exams</h3>
+                <p>Take your exam within the specified time limit with real-time timer</p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">🔒</div>
+                <h3>Secure Platform</h3>
+                <p>Safe and secure examination environment with session management</p>
+            </div>
+            
+        </div>
+        
+        <div class="contact-info">
+            <h3>Need Help?</h3>
+            <p><strong>Technical Support:</strong> aci-bd@gmail.com</p>
+            <p><strong>Phone:</strong> +880 1798 029380</p>
+            <p><em>If you face any technical difficulties during the exam, contact us immediately.</em></p>
+        </div>
+    </div>
+    
+    <script>
+        function accessExam() {
+            const examCode = document.getElementById('exam_code').value.trim();
+            if (!examCode) {
+                alert('Please enter an exam link or code');
+                return;
+            }
+            
+            // If it's a full URL, redirect directly
+            if (examCode.startsWith('http')) {
+                window.location.href = examCode;
+            } else {
+                // Otherwise, treat it as an exam code
+                window.location.href = `/exam/${examCode}`;
+            }
+        }
+        
+        // Allow form submission on Enter key
+        document.getElementById('exam_code').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                accessExam();
+            }
+        });
+        
+        // Auto-focus on input
+        document.getElementById('exam_code').focus();
+    </script>
+</body>
+</html>

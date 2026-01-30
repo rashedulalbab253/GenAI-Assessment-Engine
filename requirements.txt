@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+python-multipart
+jinja2
+groq
+pydantic
+python-jose[cryptography]
+passlib[bcrypt]
+aiofiles
+pytz

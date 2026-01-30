@@ -1,0 +1,2943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Exam - Admin Dashboard</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid white;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .nav-link:hover {
+            background: white;
+            color: #667eea;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .form-header {
+            background: #f8f9ff;
+            padding: 25px 30px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+        
+        .form-header h2 {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .form-header p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .form-content {
+            padding: 30px;
+        }
+        
+        .form-section {
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+        }
+        
+        .input-group .form-group {
+            margin-bottom: 0;
+        }
+        
+        .section-card {
+            background: #f8f9ff;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+        
+        .section-card.active {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+            opacity: 1;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .section-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+        
+        .section-toggle:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .section-icon {
+            font-size: 1.5rem;
+        }
+        
+        .section-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #333;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: #ccc;
+            border-radius: 13px;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+        
+        .toggle-switch.active {
+            background: #667eea;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+        
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(24px);
+        }
+        
+        .section-content {
+            display: none;
+        }
+        
+        .section-content.active {
+            display: block !important;
+        }
+        
+        .question-types-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .syllabus-section {
+            background: #f0f9ff;
+            border: 2px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .syllabus-section textarea {
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .syllabus-section textarea:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+        
+        .syllabus-section textarea:disabled {
+            background-color: #f3f4f6;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+        
+        .question-type-card {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .question-type-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .question-type-icon {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        
+        .question-type-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+        
+        .error {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .info {
+            background: #f0f9ff;
+            color: #1e40af;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .form-actions {
+            padding: 25px 30px;
+            background: #f8f9ff;
+            border-top: 2px solid #e1e5e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .loading {
+            display: none;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .total-summary {
+            background: #f0f9ff;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+            border: 2px solid #3b82f6;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .summary-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .summary-label {
+            font-size: 0.85rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Language Settings Styles */
+        .language-settings {
+            background: #e8f5e9;
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .language-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .language-info h4 {
+            color: #065f46;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .language-info p {
+            color: #065f46;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .language-selection {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .language-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .language-option {
+            background: #f8f9fa;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .language-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .language-option.selected {
+            border-color: #10b981;
+            background: #f0fdf4;
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.2);
+        }
+
+        .language-option input[type="radio"] {
+            display: none;
+        }
+
+        .language-option-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .language-option-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .language-option-desc {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .language-preview {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .language-preview h5 {
+            color: #374151;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .preview-content {
+            font-weight: 500;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #10b981;
+        }
+
+        .preview-english {
+            color: #059669;
+        }
+
+        .preview-bengali {
+            color: #d97706;
+        }
+
+        /* Feedback Settings Styles */
+        .feedback-settings {
+            background: #fffbeb;
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .feedback-toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .feedback-info {
+            flex: 1;
+            margin-right: 20px;
+        }
+
+        .feedback-info h4 {
+            color: #92400e;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feedback-info p {
+            color: #92400e;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .feedback-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #d1d5db;
+            border-radius: 15px;
+            transition: background 0.3s;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .feedback-switch.enabled {
+            background: #10b981;
+        }
+
+        .feedback-switch .switch-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .feedback-switch.enabled .switch-slider {
+            transform: translateX(30px);
+        }
+
+        .feedback-preview {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .feedback-preview h5 {
+            color: #374151;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .preview-enabled {
+            color: #059669;
+            font-weight: 500;
+        }
+
+        .preview-disabled {
+            color: #d97706;
+            font-weight: 500;
+        }
+
+        /* Negative Marking Styles */
+        .negative-marking-section {
+            background: #fef2f2;
+            border: 2px solid #ef4444;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .negative-marking-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .negative-marking-info h4 {
+            color: #dc2626;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .negative-marking-info p {
+            color: #dc2626;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .negative-marking-controls {
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .negative-marking-controls.active {
+            display: grid;
+        }
+
+        .section-negative-marking {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .section-negative-marking.enabled {
+            border-color: #ef4444;
+            background: #fefefe;
+        }
+
+        .section-negative-marking h5 {
+            color: #374151;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .negative-marking-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .negative-marking-input {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .negative-marking-input.active {
+            display: block;
+        }
+
+        .negative-marks-field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f9fafb;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+        }
+
+        .negative-marks-field input {
+            width: 80px;
+            padding: 5px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .negative-marks-field label {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .warning-note {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+        }
+
+        .warning-note p {
+            color: #92400e;
+            font-size: 0.85rem;
+            margin: 0;
+            line-height: 1.4;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .form-content {
+                padding: 20px;
+            }
+            
+            .form-grid,
+            .question-types-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                padding: 20px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .feedback-toggle-container {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .feedback-info {
+                margin-right: 0;
+            }
+
+            .negative-marking-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .negative-marking-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .language-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>📝 Create New Exam</h1>
+            <a href="/admin" class="nav-link">← Back to Dashboard</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <h2>Set Up New Examination</h2>
+                <p>Configure your exam details, language, question sections, negative marking, and evaluation criteria. AI will help generate relevant questions based on your specifications.</p>
+            </div>
+            
+            {% if error %}
+            <div style="padding: 20px;">
+                <div class="error">
+                    <strong>❌ Error:</strong> {{ error }}
+                </div>
+            </div>
+            {% endif %}
+            
+            <form method="POST" action="/admin/create-exam" id="examForm" enctype="application/x-www-form-urlencoded">
+                <div class="form-content">
+                    <!-- Basic Information -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            📋 Basic Information
+                        </h3>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="title">📝 Exam Title *</label>
+                                <input type="text" id="title" name="title" required 
+                                       placeholder="e.g., Software Engineer Comprehensive Assessment"
+                                       value="">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="department">🏢 Department *</label>
+                                <input type="text" id="department" name="department" required 
+                                       placeholder="e.g., Information Technology"
+                                       value="">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="position">👤 Position/Job Title *</label>
+                                <input type="text" id="position" name="position" required 
+                                       placeholder="e.g., Senior Software Engineer"
+                                       value="">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="time_limit">⏰ Time Limit (minutes) *</label>
+                                <input type="number" id="time_limit" name="time_limit" required 
+                                       min="10" max="300" value="180">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="description">📄 Exam Description</label>
+                            <textarea id="description" name="description" rows="3" 
+                                    placeholder="Brief description of the exam purpose and scope..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Language Settings -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            🌐 Exam Language Configuration
+                        </h3>
+                        
+                        <div class="language-settings">
+                            <div class="language-header">
+                                <div class="language-info">
+                                    <h4>
+                                        <span>🗣️</span> Select Exam Language
+                                    </h4>
+                                    <p>Choose the primary language for the exam. Note: Bengali section will always be in Bengali, and English section will always be in English, regardless of this setting.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="language-selection">
+                                <div class="language-options">
+                                    <div class="language-option selected" onclick="selectLanguage('english')">
+                                        <input type="radio" name="exam_language" value="english" checked>
+                                        <div class="language-option-icon">🇬🇧</div>
+                                        <div class="language-option-title">English Version</div>
+                                        <div class="language-option-desc">All sections except Bengali will be in English. Bengali section remains in Bengali.</div>
+                                    </div>
+                                    
+                                    <div class="language-option" onclick="selectLanguage('bengali')">
+                                        <input type="radio" name="exam_language" value="bengali">
+                                        <div class="language-option-icon">🇧🇩</div>
+                                        <div class="language-option-title">Bengali Version</div>
+                                        <div class="language-option-desc">All sections except English will be in Bengali. English section remains in English.</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="language-preview">
+                                    <h5>👁️ Language Distribution Preview:</h5>
+                                    <div id="language-preview-content" class="preview-content preview-english">
+                                        <strong>English Version Selected:</strong><br>
+                                        • Technical, Mathematics, General Knowledge, Logical Reasoning: <span style="color: #3b82f6;">English</span><br>
+                                        • Bengali Section: <span style="color: #f59e0b;">Bengali</span><br>
+                                        • English Section: <span style="color: #3b82f6;">English</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Settings -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            💬 Candidate Feedback Settings
+                        </h3>
+                        
+                        <div class="feedback-settings">
+                            <div class="feedback-toggle-container">
+                                <div class="feedback-info">
+                                    <h4>
+                                        <span>📊</span> Post-Exam Feedback
+                                    </h4>
+                                    <p>Control whether candidates see detailed feedback, correct answers, and explanations after submitting their exam.</p>
+                                </div>
+                                <div class="feedback-switch enabled" id="feedback-switch" onclick="toggleFeedback()">
+                                    <div class="switch-slider"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="feedback-preview">
+                                <h5>👁️ What candidates will see after submission:</h5>
+                                <div id="feedback-preview-text" class="preview-enabled">
+                                    ✅ <strong>Feedback Enabled:</strong> Candidates will see their scores, correct answers, explanations, and detailed feedback for each question.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden input for feedback setting -->
+                        <input type="hidden" id="show_feedback" name="show_feedback" value="on">
+                    </div>
+
+                    <!-- Negative Marking Settings -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            ➖ Negative Marking Configuration
+                        </h3>
+                        
+                        <div class="negative-marking-section">
+                            <div class="negative-marking-header">
+                                <div class="negative-marking-info">
+                                    <h4>
+                                        <span>⚠️</span> Negative Marking System
+                                    </h4>
+                                    <p>Configure negative marking for incorrect MCQ answers. You can set different negative marking for each section.</p>
+                                </div>
+                                <div class="feedback-switch" id="negative-marking-switch" onclick="toggleNegativeMarking()">
+                                    <div class="switch-slider"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="negative-marking-controls" id="negative-marking-controls">
+                                <div class="section-negative-marking" id="technical-negative-marking">
+                                    <h5>⚙️ Technical Skills</h5>
+                                    <div class="negative-marking-toggle">
+                                        <input type="checkbox" id="technical_negative_enabled" onchange="toggleSectionNegativeMarking('technical')">
+                                        <label for="technical_negative_enabled">Enable negative marking for Technical MCQs</label>
+                                    </div>
+                                    <div class="negative-marking-input" id="technical-negative-input">
+                                        <div class="negative-marks-field">
+                                            <label>Negative marks per wrong answer:</label>
+                                            <input type="number" id="technical_negative_marks" step="0.25" min="0" max="5" value="0.5">
+                                            <label>marks</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="section-negative-marking" id="english-negative-marking">
+                                    <h5>🇬🇧 English Language</h5>
+                                    <div class="negative-marking-toggle">
+                                        <input type="checkbox" id="english_negative_enabled" onchange="toggleSectionNegativeMarking('english')">
+                                        <label for="english_negative_enabled">Enable negative marking for English MCQs</label>
+                                    </div>
+                                    <div class="negative-marking-input" id="english-negative-input">
+                                        <div class="negative-marks-field">
+                                            <label>Negative marks per wrong answer:</label>
+                                            <input type="number" id="english_negative_marks" step="0.25" min="0" max="5" value="0.25">
+                                            <label>marks</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="section-negative-marking" id="mathematics-negative-marking">
+                                    <h5>🔢 Mathematics</h5>
+                                    <div class="negative-marking-toggle">
+                                        <input type="checkbox" id="mathematics_negative_enabled" onchange="toggleSectionNegativeMarking('mathematics')">
+                                        <label for="mathematics_negative_enabled">Enable negative marking for Mathematics MCQs</label>
+                                    </div>
+                                    <div class="negative-marking-input" id="mathematics-negative-input">
+                                        <div class="negative-marks-field">
+                                            <label>Negative marks per wrong answer:</label>
+                                            <input type="number" id="mathematics_negative_marks" step="0.25" min="0" max="5" value="0.5">
+                                            <label>marks</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="section-negative-marking" id="bengali-negative-marking">
+                                    <h5>🇧🇩 Bengali Language</h5>
+                                    <div class="negative-marking-toggle">
+                                        <input type="checkbox" id="bengali_negative_enabled" onchange="toggleSectionNegativeMarking('bengali')">
+                                        <label for="bengali_negative_enabled">Enable negative marking for Bengali MCQs</label>
+                                    </div>
+                                    <div class="negative-marking-input" id="bengali-negative-input">
+                                        <div class="negative-marks-field">
+                                            <label>Negative marks per wrong answer:</label>
+                                            <input type="number" id="bengali_negative_marks" step="0.25" min="0" max="5" value="0.25">
+                                            <label>marks</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="section-negative-marking" id="general_knowledge-negative-marking">
+                                    <h5>🌍 General Knowledge</h5>
+                                    <div class="negative-marking-toggle">
+                                        <input type="checkbox" id="general_knowledge_negative_enabled" onchange="toggleSectionNegativeMarking('general_knowledge')">
+                                        <label for="general_knowledge_negative_enabled">Enable negative marking for GK MCQs</label>
+                                    </div>
+                                    <div class="negative-marking-input" id="general_knowledge-negative-input">
+                                        <div class="negative-marks-field">
+                                            <label>Negative marks per wrong answer:</label>
+                                            <input type="number" id="general_knowledge_negative_marks" step="0.25" min="0" max="5" value="0.25">
+                                            <label>marks</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="section-negative-marking" id="logical_reasoning-negative-marking">
+                                    <h5>🧠 Logical Reasoning</h5>
+                                    <div class="negative-marking-toggle">
+                                        <input type="checkbox" id="logical_reasoning_negative_enabled" onchange="toggleSectionNegativeMarking('logical_reasoning')">
+                                        <label for="logical_reasoning_negative_enabled">Enable negative marking for Logical Reasoning MCQs</label>
+                                    </div>
+                                    <div class="negative-marking-input" id="logical_reasoning-negative-input">
+                                        <div class="negative-marks-field">
+                                            <label>Negative marks per wrong answer:</label>
+                                            <input type="number" id="logical_reasoning_negative_marks" step="0.25" min="0" max="5" value="0.5">
+                                            <label>marks</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="warning-note">
+                                <p><strong>⚠️ Important:</strong> Negative marking only applies to Multiple Choice Questions (MCQs). Short answer and essay questions are not affected by negative marking. Candidates will lose the specified marks for each incorrect MCQ answer in enabled sections.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Multi-Select Scoring Mode -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            ☑️☑️ Multi-Select MCQ Scoring Mode
+                        </h3>
+
+                        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #10b981; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                            <div style="margin-bottom: 15px;">
+                                <h4 style="color: #065f46; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                                    <span>📊</span> Choose how multi-select MCQs should be scored
+                                </h4>
+                                <p style="color: #047857; font-size: 0.9rem; margin-bottom: 15px;">
+                                    This setting determines how marks are calculated when a candidate answers multi-select MCQ questions (questions with multiple correct answers).
+                                </p>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 15px;">
+                                <!-- Partial Scoring Option -->
+                                <label style="display: flex; align-items: flex-start; gap: 15px; cursor: pointer; padding: 15px; border: 2px solid #10b981; border-radius: 10px; background: white; transition: all 0.3s ease;" class="scoring-mode-option selected" data-mode="partial">
+                                    <input type="radio" name="multi_select_scoring_mode" value="partial" checked style="margin-top: 3px; width: 20px; height: 20px; accent-color: #10b981;">
+                                    <div>
+                                        <span style="font-weight: 700; color: #065f46; font-size: 1.1rem; display: block; margin-bottom: 5px;">📈 Partial Scoring (Recommended)</span>
+                                        <p style="color: #047857; font-size: 0.85rem; margin: 0; line-height: 1.5;">
+                                            Candidates receive partial marks based on their selections. Formula: <code style="background: #d1fae5; padding: 2px 6px; border-radius: 4px;">(correct - incorrect) / total_correct × marks</code>
+                                        </p>
+                                        <div style="background: #ecfdf5; border-radius: 6px; padding: 10px; margin-top: 10px; font-size: 0.8rem; color: #065f46;">
+                                            <strong>Example:</strong> If 3 answers are correct and candidate selects 2 correct + 1 wrong:<br>
+                                            Score = (2 - 1) / 3 × full_marks = 33% of marks
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <!-- Strict Scoring Option -->
+                                <label style="display: flex; align-items: flex-start; gap: 15px; cursor: pointer; padding: 15px; border: 2px solid #d1d5db; border-radius: 10px; background: white; transition: all 0.3s ease;" class="scoring-mode-option" data-mode="strict">
+                                    <input type="radio" name="multi_select_scoring_mode" value="strict" style="margin-top: 3px; width: 20px; height: 20px; accent-color: #10b981;">
+                                    <div>
+                                        <span style="font-weight: 700; color: #374151; font-size: 1.1rem; display: block; margin-bottom: 5px;">🎯 Strict Scoring (Exact Match Only)</span>
+                                        <p style="color: #6b7280; font-size: 0.85rem; margin: 0; line-height: 1.5;">
+                                            Full marks only if candidate selects <strong>exactly</strong> all correct answers. Any missing or extra selection = 0 marks (or negative if enabled).
+                                        </p>
+                                        <div style="background: #f3f4f6; border-radius: 6px; padding: 10px; margin-top: 10px; font-size: 0.8rem; color: #374151;">
+                                            <strong>Example:</strong> If 3 answers are correct and candidate selects 2 correct + 0 wrong:<br>
+                                            Score = 0 (not an exact match)
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="warning-note" style="margin-top: 15px; background: #fef3c7; border-color: #f59e0b;">
+                                <p style="color: #92400e;"><strong>💡 Tip:</strong> Partial scoring is more forgiving and encourages candidates to attempt multi-select questions. Strict scoring is better for high-stakes exams where precision is critical.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MCQ Options Count Setting -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            🔢 MCQ Options Configuration
+                        </h3>
+
+                        <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                            <div style="margin-bottom: 15px;">
+                                <h4 style="color: #92400e; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                                    <span>📝</span> Number of Options per MCQ Question
+                                </h4>
+                                <p style="color: #a16207; font-size: 0.9rem; margin-bottom: 15px;">
+                                    Configure how many answer options (A, B, C, D, E, F) each MCQ question should have. This applies to AI-generated questions. You can still edit individual questions after creation.
+                                </p>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <label for="mcq_options_count" style="font-weight: 600; color: #92400e;">Options per MCQ:</label>
+                                    <select id="mcq_options_count" name="mcq_options_count" style="padding: 10px 15px; border: 2px solid #f59e0b; border-radius: 8px; font-size: 1rem; font-weight: 600; background: white; cursor: pointer; min-width: 80px;">
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4" selected>4 (Standard)</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                    </select>
+                                </div>
+
+                                <div id="mcq_options_preview" style="display: flex; gap: 8px; align-items: center;">
+                                    <span style="color: #92400e; font-weight: 500;">Preview:</span>
+                                    <span class="option-preview-letter" style="background: #10b981; color: white; padding: 5px 10px; border-radius: 5px; font-weight: 600;">A</span>
+                                    <span class="option-preview-letter" style="background: #6b7280; color: white; padding: 5px 10px; border-radius: 5px; font-weight: 600;">B</span>
+                                    <span class="option-preview-letter" style="background: #6b7280; color: white; padding: 5px 10px; border-radius: 5px; font-weight: 600;">C</span>
+                                    <span class="option-preview-letter" style="background: #6b7280; color: white; padding: 5px 10px; border-radius: 5px; font-weight: 600;">D</span>
+                                </div>
+                            </div>
+
+                            <div class="warning-note" style="margin-top: 15px; background: #fff7ed; border-color: #fb923c;">
+                                <p style="color: #9a3412;"><strong>💡 Note:</strong> Standard exams typically use 4 options. Use fewer options for easier questions or more options for increased difficulty. For multi-select MCQs, ensure you have enough options to make the question meaningful.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question Sections -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            🧩 Question Sections
+                        </h3>
+                        
+                        <div class="info">
+                            <strong>💡 Note:</strong> Enable sections as needed. You can include both technical and non-technical questions. Choose between AI generation or manual question creation.
+                        </div>
+                        
+                        <!-- Question Generation Method - Global Default -->
+                        <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+                            <h4 style="color: #856404; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                                <span>🤖</span> Default Question Generation Method
+                            </h4>
+                            <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px 15px; border: 2px solid #e1e5e9; border-radius: 8px; background: white; transition: all 0.3s ease;" onclick="toggleGenerationMethod('ai')">
+                                    <input type="radio" name="generation_method" value="ai" checked onchange="handleGenerationMethodChange()">
+                                    <span style="font-weight: 600; color: #333;">🤖 AI Generated (Recommended)</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px 15px; border: 2px solid #e1e5e9; border-radius: 8px; background: white; transition: all 0.3s ease;" onclick="toggleGenerationMethod('manual')">
+                                    <input type="radio" name="generation_method" value="manual" onchange="handleGenerationMethodChange()">
+                                    <span style="font-weight: 600; color: #333;">✍️ Manual Creation</span>
+                                </label>
+                            </div>
+                            <p style="color: #856404; margin-top: 10px; font-size: 0.9rem;">
+                                <strong>💡 Tip:</strong> This sets the default for all sections. You can override this for each section individually using the toggle inside each section.
+                            </p>
+                        </div>
+
+                        <!-- AI Prompt Instructions - Difficulty Level & Characteristics -->
+                        <div id="ai-instructions-section" style="background: linear-gradient(135deg, #ede9fe 0%, #f5f3ff 100%); border: 2px solid #8b5cf6; border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+                            <h4 style="color: #6d28d9; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                                <span>🎯</span> AI Question Generation Instructions
+                            </h4>
+                            <p style="color: #5b21b6; font-size: 0.9rem; margin-bottom: 15px; line-height: 1.5;">
+                                Customize how AI generates questions. Specify difficulty level, question style, and any special requirements.
+                            </p>
+
+                            <!-- Difficulty Level Selection -->
+                            <div style="margin-bottom: 20px;">
+                                <label style="font-weight: 600; color: #4c1d95; margin-bottom: 10px; display: block;">
+                                    📊 Difficulty Level
+                                </label>
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 18px; border: 2px solid #c4b5fd; border-radius: 8px; background: white; transition: all 0.3s ease;" class="difficulty-option" data-level="easy">
+                                        <input type="radio" name="difficulty_level" value="easy" style="display: none;">
+                                        <span style="font-size: 1.2rem;">🟢</span>
+                                        <span style="font-weight: 600; color: #333;">Easy</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 18px; border: 2px solid #8b5cf6; border-radius: 8px; background: #f5f3ff; transition: all 0.3s ease;" class="difficulty-option selected" data-level="medium">
+                                        <input type="radio" name="difficulty_level" value="medium" checked style="display: none;">
+                                        <span style="font-size: 1.2rem;">🟡</span>
+                                        <span style="font-weight: 600; color: #333;">Medium</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 18px; border: 2px solid #c4b5fd; border-radius: 8px; background: white; transition: all 0.3s ease;" class="difficulty-option" data-level="hard">
+                                        <input type="radio" name="difficulty_level" value="hard" style="display: none;">
+                                        <span style="font-size: 1.2rem;">🔴</span>
+                                        <span style="font-weight: 600; color: #333;">Hard</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 18px; border: 2px solid #c4b5fd; border-radius: 8px; background: white; transition: all 0.3s ease;" class="difficulty-option" data-level="mixed">
+                                        <input type="radio" name="difficulty_level" value="mixed" style="display: none;">
+                                        <span style="font-size: 1.2rem;">🎯</span>
+                                        <span style="font-weight: 600; color: #333;">Mixed</span>
+                                    </label>
+                                </div>
+                                <p style="color: #6d28d9; font-size: 0.85rem; margin-top: 8px;">
+                                    <strong>Easy:</strong> Basic concepts | <strong>Medium:</strong> Intermediate application | <strong>Hard:</strong> Advanced analysis | <strong>Mixed:</strong> Combination of all levels
+                                </p>
+                            </div>
+
+                            <!-- Custom AI Instructions -->
+                            <div>
+                                <label style="font-weight: 600; color: #4c1d95; margin-bottom: 10px; display: block;">
+                                    📝 Custom Instructions for AI (Optional)
+                                </label>
+                                <textarea
+                                    id="ai_custom_instructions"
+                                    name="ai_custom_instructions"
+                                    rows="4"
+                                    placeholder="Add any specific instructions for AI question generation. Examples:
+- Focus on practical, real-world scenarios
+- Include questions about recent industry trends
+- Make MCQ options clearly distinguishable
+- Include code snippets for technical questions
+- Focus on problem-solving rather than memorization
+- Include questions that test critical thinking"
+                                    style="width: 100%; padding: 12px; border: 2px solid #c4b5fd; border-radius: 8px; font-size: 0.95rem; line-height: 1.5; resize: vertical; font-family: inherit;"
+                                ></textarea>
+                                <p style="color: #6d28d9; font-size: 0.85rem; margin-top: 8px;">
+                                    <strong>💡 Pro Tip:</strong> Be specific about what you want. The AI will follow these instructions when generating questions for all sections.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Technical Section -->
+                        <div class="section-card" id="technical-section">
+                            <div class="section-header">
+                                <div class="section-toggle" onclick="toggleSection('technical')">
+                                    <span class="section-icon">⚙️</span>
+                                    <span class="section-name">Technical Skills</span>
+                                </div>
+                                <div class="toggle-switch active" id="technical-toggle">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="section-content active" id="technical-content">
+                                <p style="color: #666; margin-bottom: 15px; font-size: 0.9rem;">
+                                    Job-specific technical knowledge, programming concepts, system design, and industry best practices.
+                                </p>
+
+                                <!-- Per-Section Generation Mode Toggle -->
+                                <div class="section-generation-mode" id="technical-generation-mode" style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); border: 2px solid #0ea5e9; border-radius: 8px; padding: 12px 15px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                                    <span style="font-weight: 600; color: #0369a1; font-size: 0.9rem;">
+                                        📝 Generation Mode for this section:
+                                    </span>
+                                    <div style="display: flex; gap: 10px;">
+                                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 6px 12px; border: 2px solid #0ea5e9; border-radius: 6px; background: white; font-size: 0.85rem; transition: all 0.3s ease;" class="section-mode-btn active" data-mode="ai">
+                                            <input type="radio" name="technical_generation_mode" value="ai" checked onchange="updateSectionGenerationMode('technical', 'ai')" style="display: none;">
+                                            <span>🤖 AI</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 6px 12px; border: 2px solid #e1e5e9; border-radius: 6px; background: white; font-size: 0.85rem; transition: all 0.3s ease;" class="section-mode-btn" data-mode="manual">
+                                            <input type="radio" name="technical_generation_mode" value="manual" onchange="updateSectionGenerationMode('technical', 'manual')" style="display: none;">
+                                            <span>✍️ Manual</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Syllabus/Description Box -->
+                                <div class="syllabus-section">
+                                    <label for="technical_syllabus" style="font-weight: 600; color: #333; margin-bottom: 8px; display: block;">
+                                        📋 Syllabus/Topics (Optional)
+                                    </label>
+                                    <textarea
+                                        id="technical_syllabus"
+                                        name="technical_syllabus"
+                                        rows="3"
+                                        placeholder="Specify topics, technologies, or requirements for technical questions. E.g., 'Focus on JavaScript, React, Node.js, database design, REST APIs, system architecture, algorithms and data structures'"
+                                        style="width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 6px; font-size: 0.9rem; line-height: 1.4; margin-bottom: 15px; resize: vertical;"
+                                    ></textarea>
+                                </div>
+                                
+                                <div class="question-types-grid">
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">☑️</div>
+                                        <div class="question-type-title">Single-Answer MCQ</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="technical_mcq_count"
+                                                       min="0" max="50" value="8" onchange="updateTotal()">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Marks</label>
+                                                <input type="number" name="technical_mcq_marks"
+                                                       min="1" max="10" value="2" onchange="updateTotal()">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">☑️☑️</div>
+                                        <div class="question-type-title">Multi-Select MCQ</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="technical_multi_select_count"
+                                                       min="0" max="20" value="2" onchange="updateTotal()">
+                                            </div>
+                                            <div class="form-group">
+                                                <label title="Uses same marks as Single MCQ">Marks</label>
+                                                <input type="number" name="technical_multi_select_marks"
+                                                       min="1" max="10" value="2" onchange="updateTotal()" disabled title="Uses same marks as Single MCQ">
+                                            </div>
+                                        </div>
+                                        <small class="help-text">Questions with multiple correct answers</small>
+                                    </div>
+
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">✍️</div>
+                                        <div class="question-type-title">Short Answer</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="technical_short_count" 
+                                                       min="0" max="20" value="2" onchange="updateTotal()">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Marks</label>
+                                                <input type="number" name="technical_short_marks" 
+                                                       min="1" max="20" value="5" onchange="updateTotal()">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">📝</div>
+                                        <div class="question-type-title">Essay</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="technical_essay_count" 
+                                                       min="0" max="10" value="1" onchange="updateTotal()">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Marks</label>
+                                                <input type="number" name="technical_essay_marks" 
+                                                       min="1" max="50" value="10" onchange="updateTotal()">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- English Section -->
+                        <div class="section-card" id="english-section">
+                            <div class="section-header">
+                                <div class="section-toggle" onclick="toggleSection('english')">
+                                    <span class="section-icon">🇬🇧</span>
+                                    <span class="section-name">English Language</span>
+                                </div>
+                                <div class="toggle-switch" id="english-toggle">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="section-content" id="english-content">
+                                <p style="color: #666; margin-bottom: 15px; font-size: 0.9rem;">
+                                    Grammar, vocabulary, reading comprehension, and professional communication skills. <strong>Always in English language.</strong>
+                                </p>
+
+                                <!-- Per-Section Generation Mode Toggle -->
+                                <div class="section-generation-mode" id="english-generation-mode" style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); border: 2px solid #0ea5e9; border-radius: 8px; padding: 12px 15px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                                    <span style="font-weight: 600; color: #0369a1; font-size: 0.9rem;">
+                                        📝 Generation Mode for this section:
+                                    </span>
+                                    <div style="display: flex; gap: 10px;">
+                                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 6px 12px; border: 2px solid #0ea5e9; border-radius: 6px; background: white; font-size: 0.85rem; transition: all 0.3s ease;" class="section-mode-btn active" data-mode="ai">
+                                            <input type="radio" name="english_generation_mode" value="ai" checked onchange="updateSectionGenerationMode('english', 'ai')" style="display: none;">
+                                            <span>🤖 AI</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 6px 12px; border: 2px solid #e1e5e9; border-radius: 6px; background: white; font-size: 0.85rem; transition: all 0.3s ease;" class="section-mode-btn" data-mode="manual">
+                                            <input type="radio" name="english_generation_mode" value="manual" onchange="updateSectionGenerationMode('english', 'manual')" style="display: none;">
+                                            <span>✍️ Manual</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="syllabus-section">
+                                    <label for="english_syllabus" style="font-weight: 600; color: #333; margin-bottom: 8px; display: block;">
+                                        📋 Syllabus/Topics (Optional)
+                                    </label>
+                                    <textarea
+                                        id="english_syllabus"
+                                        name="english_syllabus"
+                                        rows="3"
+                                        placeholder="Specify English language requirements. E.g., 'Focus on business communication, email writing, grammar rules (tenses, articles, prepositions), vocabulary building, reading comprehension of technical documents'"
+                                        style="width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 6px; font-size: 0.9rem; line-height: 1.4; margin-bottom: 15px; resize: vertical;"
+                                        disabled
+                                    ></textarea>
+                                </div>
+                                
+                                <div class="question-types-grid">
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">☑️</div>
+                                        <div class="question-type-title">Single-Answer MCQ</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="english_mcq_count"
+                                                       min="0" max="50" value="5" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Marks</label>
+                                                <input type="number" name="english_mcq_marks"
+                                                       min="1" max="10" value="1" onchange="updateTotal()" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">☑️☑️</div>
+                                        <div class="question-type-title">Multi-Select MCQ</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="english_multi_select_count"
+                                                       min="0" max="20" value="0" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label title="Uses same marks as Single MCQ">Marks</label>
+                                                <input type="number" name="english_multi_select_marks"
+                                                       min="1" max="10" value="1" onchange="updateTotal()" disabled title="Uses same marks as Single MCQ">
+                                            </div>
+                                        </div>
+                                        <small class="help-text">Questions with multiple correct answers</small>
+                                    </div>
+
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">✍️</div>
+                                        <div class="question-type-title">Short Answer</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="english_short_count"
+                                                       min="0" max="20" value="1" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Marks</label>
+                                                <input type="number" name="english_short_marks"
+                                                       min="1" max="20" value="5" onchange="updateTotal()" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">📝</div>
+                                        <div class="question-type-title">Essay</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="english_essay_count"
+                                                       min="0" max="10" value="1" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Marks</label>
+                                                <input type="number" name="english_essay_marks"
+                                                       min="1" max="50" value="10" onchange="updateTotal()" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mathematics Section -->
+                        <div class="section-card" id="mathematics-section">
+                            <div class="section-header">
+                                <div class="section-toggle" onclick="toggleSection('mathematics')">
+                                    <span class="section-icon">🔢</span>
+                                    <span class="section-name">Mathematics</span>
+                                </div>
+                                <div class="toggle-switch" id="mathematics-toggle">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="section-content" id="mathematics-content">
+                                <p style="color: #666; margin-bottom: 15px; font-size: 0.9rem;">
+                                    Basic arithmetic, algebra, statistics, logical reasoning, and quantitative analysis.
+                                </p>
+
+                                <!-- Per-Section Generation Mode Toggle -->
+                                <div class="section-generation-mode" id="mathematics-generation-mode" style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); border: 2px solid #0ea5e9; border-radius: 8px; padding: 12px 15px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                                    <span style="font-weight: 600; color: #0369a1; font-size: 0.9rem;">
+                                        📝 Generation Mode for this section:
+                                    </span>
+                                    <div style="display: flex; gap: 10px;">
+                                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 6px 12px; border: 2px solid #0ea5e9; border-radius: 6px; background: white; font-size: 0.85rem; transition: all 0.3s ease;" class="section-mode-btn active" data-mode="ai">
+                                            <input type="radio" name="mathematics_generation_mode" value="ai" checked onchange="updateSectionGenerationMode('mathematics', 'ai')" style="display: none;">
+                                            <span>🤖 AI</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 6px 12px; border: 2px solid #e1e5e9; border-radius: 6px; background: white; font-size: 0.85rem; transition: all 0.3s ease;" class="section-mode-btn" data-mode="manual">
+                                            <input type="radio" name="mathematics_generation_mode" value="manual" onchange="updateSectionGenerationMode('mathematics', 'manual')" style="display: none;">
+                                            <span>✍️ Manual</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="syllabus-section">
+                                    <label for="mathematics_syllabus" style="font-weight: 600; color: #333; margin-bottom: 8px; display: block;">
+                                        📋 Syllabus/Topics (Optional)
+                                    </label>
+                                    <textarea
+                                        id="mathematics_syllabus"
+                                        name="mathematics_syllabus"
+                                        rows="3"
+                                        placeholder="Specify math topics. E.g., 'Focus on basic arithmetic, percentages, ratios, probability, statistics, data interpretation, algebra basics, geometry fundamentals'"
+                                        style="width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 6px; font-size: 0.9rem; line-height: 1.4; margin-bottom: 15px; resize: vertical;"
+                                        disabled
+                                    ></textarea>
+                                </div>
+                                
+                                <div class="question-types-grid">
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">☑️</div>
+                                        <div class="question-type-title">Single-Answer MCQ</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="mathematics_mcq_count"
+                                                       min="0" max="50" value="5" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Marks</label>
+                                                <input type="number" name="mathematics_mcq_marks"
+                                                       min="1" max="10" value="1" onchange="updateTotal()" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">☑️☑️</div>
+                                        <div class="question-type-title">Multi-Select MCQ</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="mathematics_multi_select_count"
+                                                       min="0" max="20" value="0" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label title="Uses same marks as Single MCQ">Marks</label>
+                                                <input type="number" name="mathematics_multi_select_marks"
+                                                       min="1" max="10" value="1" onchange="updateTotal()" disabled title="Uses same marks as Single MCQ">
+                                            </div>
+                                        </div>
+                                        <small class="help-text">Questions with multiple correct answers</small>
+                                    </div>
+
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">✍️</div>
+                                        <div class="question-type-title">Short Answer</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="mathematics_short_count"
+                                                       min="0" max="20" value="1" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Marks</label>
+                                                <input type="number" name="mathematics_short_marks"
+                                                       min="1" max="20" value="5" onchange="updateTotal()" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">📝</div>
+                                        <div class="question-type-title">Essay</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="mathematics_essay_count"
+                                                       min="0" max="10" value="0" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Marks</label>
+                                                <input type="number" name="mathematics_essay_marks"
+                                                       min="1" max="50" value="10" onchange="updateTotal()" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bengali Section -->
+                        <div class="section-card" id="bengali-section">
+                            <div class="section-header">
+                                <div class="section-toggle" onclick="toggleSection('bengali')">
+                                    <span class="section-icon">🇧🇩</span>
+                                    <span class="section-name">Bengali Language</span>
+                                </div>
+                                <div class="toggle-switch" id="bengali-toggle">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="section-content" id="bengali-content">
+                                <p style="color: #666; margin-bottom: 15px; font-size: 0.9rem;">
+                                    Bengali grammar, vocabulary, comprehension, and cultural knowledge. <strong>Always in Bengali language.</strong>
+                                </p>
+
+                                <!-- Per-Section Generation Mode Toggle -->
+                                <div class="section-generation-mode" id="bengali-generation-mode" style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); border: 2px solid #0ea5e9; border-radius: 8px; padding: 12px 15px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                                    <span style="font-weight: 600; color: #0369a1; font-size: 0.9rem;">
+                                        📝 Generation Mode for this section:
+                                    </span>
+                                    <div style="display: flex; gap: 10px;">
+                                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 6px 12px; border: 2px solid #0ea5e9; border-radius: 6px; background: white; font-size: 0.85rem; transition: all 0.3s ease;" class="section-mode-btn active" data-mode="ai">
+                                            <input type="radio" name="bengali_generation_mode" value="ai" checked onchange="updateSectionGenerationMode('bengali', 'ai')" style="display: none;">
+                                            <span>🤖 AI</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 6px 12px; border: 2px solid #e1e5e9; border-radius: 6px; background: white; font-size: 0.85rem; transition: all 0.3s ease;" class="section-mode-btn" data-mode="manual">
+                                            <input type="radio" name="bengali_generation_mode" value="manual" onchange="updateSectionGenerationMode('bengali', 'manual')" style="display: none;">
+                                            <span>✍️ Manual</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="syllabus-section">
+                                    <label for="bengali_syllabus" style="font-weight: 600; color: #333; margin-bottom: 8px; display: block;">
+                                        📋 Syllabus/Topics (Optional)
+                                    </label>
+                                    <textarea
+                                        id="bengali_syllabus"
+                                        name="bengali_syllabus"
+                                        rows="3"
+                                        placeholder="Specify Bengali language requirements. E.g., 'Focus on grammar rules, sentence structure, vocabulary, famous Bengali literature, cultural knowledge, translation skills'"
+                                        style="width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 6px; font-size: 0.9rem; line-height: 1.4; margin-bottom: 15px; resize: vertical;"
+                                        disabled
+                                    ></textarea>
+                                </div>
+                                
+                                <div class="question-types-grid">
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">☑️</div>
+                                        <div class="question-type-title">Single-Answer MCQ</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="bengali_mcq_count"
+                                                       min="0" max="50" value="3" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Marks</label>
+                                                <input type="number" name="bengali_mcq_marks"
+                                                       min="1" max="10" value="1" onchange="updateTotal()" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">☑️☑️</div>
+                                        <div class="question-type-title">Multi-Select MCQ</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="bengali_multi_select_count"
+                                                       min="0" max="20" value="0" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label title="Uses same marks as Single MCQ">Marks</label>
+                                                <input type="number" name="bengali_multi_select_marks"
+                                                       min="1" max="10" value="1" onchange="updateTotal()" disabled title="Uses same marks as Single MCQ">
+                                            </div>
+                                        </div>
+                                        <small class="help-text">Questions with multiple correct answers</small>
+                                    </div>
+
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">✍️</div>
+                                        <div class="question-type-title">Short Answer</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="bengali_short_count"
+                                                       min="0" max="20" value="1" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Marks</label>
+                                                <input type="number" name="bengali_short_marks"
+                                                       min="1" max="20" value="5" onchange="updateTotal()" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">📝</div>
+                                        <div class="question-type-title">Essay</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="bengali_essay_count"
+                                                       min="0" max="10" value="1" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Marks</label>
+                                                <input type="number" name="bengali_essay_marks"
+                                                       min="1" max="50" value="10" onchange="updateTotal()" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- General Knowledge Section -->
+                        <div class="section-card" id="general_knowledge-section">
+                            <div class="section-header">
+                                <div class="section-toggle" onclick="toggleSection('general_knowledge')">
+                                    <span class="section-icon">🌍</span>
+                                    <span class="section-name">General Knowledge</span>
+                                </div>
+                                <div class="toggle-switch" id="general_knowledge-toggle">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="section-content" id="general_knowledge-content">
+                                <p style="color: #666; margin-bottom: 15px; font-size: 0.9rem;">
+                                    Current affairs, history, geography, science, sports, and general awareness.
+                                </p>
+
+                                <!-- Per-Section Generation Mode Toggle -->
+                                <div class="section-generation-mode" id="general_knowledge-generation-mode" style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); border: 2px solid #0ea5e9; border-radius: 8px; padding: 12px 15px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                                    <span style="font-weight: 600; color: #0369a1; font-size: 0.9rem;">
+                                        📝 Generation Mode for this section:
+                                    </span>
+                                    <div style="display: flex; gap: 10px;">
+                                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 6px 12px; border: 2px solid #0ea5e9; border-radius: 6px; background: white; font-size: 0.85rem; transition: all 0.3s ease;" class="section-mode-btn active" data-mode="ai">
+                                            <input type="radio" name="general_knowledge_generation_mode" value="ai" checked onchange="updateSectionGenerationMode('general_knowledge', 'ai')" style="display: none;">
+                                            <span>🤖 AI</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 6px 12px; border: 2px solid #e1e5e9; border-radius: 6px; background: white; font-size: 0.85rem; transition: all 0.3s ease;" class="section-mode-btn" data-mode="manual">
+                                            <input type="radio" name="general_knowledge_generation_mode" value="manual" onchange="updateSectionGenerationMode('general_knowledge', 'manual')" style="display: none;">
+                                            <span>✍️ Manual</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="syllabus-section">
+                                    <label for="general_knowledge_syllabus" style="font-weight: 600; color: #333; margin-bottom: 8px; display: block;">
+                                        📋 Syllabus/Topics (Optional)
+                                    </label>
+                                    <textarea
+                                        id="general_knowledge_syllabus"
+                                        name="general_knowledge_syllabus"
+                                        rows="3"
+                                        placeholder="Specify GK topics. E.g., 'Focus on current affairs 2024-2025, Bangladesh history, world geography, basic science, recent technology trends, sports events'"
+                                        style="width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 6px; font-size: 0.9rem; line-height: 1.4; margin-bottom: 15px; resize: vertical;"
+                                        disabled
+                                    ></textarea>
+                                </div>
+                                
+                                <div class="question-types-grid">
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">☑️</div>
+                                        <div class="question-type-title">Single-Answer MCQ</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="general_knowledge_mcq_count"
+                                                       min="0" max="50" value="5" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Marks</label>
+                                                <input type="number" name="general_knowledge_mcq_marks"
+                                                       min="1" max="10" value="1" onchange="updateTotal()" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">☑️☑️</div>
+                                        <div class="question-type-title">Multi-Select MCQ</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="general_knowledge_multi_select_count"
+                                                       min="0" max="20" value="0" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label title="Uses same marks as Single MCQ">Marks</label>
+                                                <input type="number" name="general_knowledge_multi_select_marks"
+                                                       min="1" max="10" value="1" onchange="updateTotal()" disabled title="Uses same marks as Single MCQ">
+                                            </div>
+                                        </div>
+                                        <small class="help-text">Questions with multiple correct answers</small>
+                                    </div>
+
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">✍️</div>
+                                        <div class="question-type-title">Short Answer</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="general_knowledge_short_count"
+                                                       min="0" max="20" value="0" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Marks</label>
+                                                <input type="number" name="general_knowledge_short_marks"
+                                                       min="1" max="20" value="5" onchange="updateTotal()" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">📝</div>
+                                        <div class="question-type-title">Essay</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="general_knowledge_essay_count"
+                                                       min="0" max="10" value="0" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Marks</label>
+                                                <input type="number" name="general_knowledge_essay_marks"
+                                                       min="1" max="50" value="10" onchange="updateTotal()" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Logical Reasoning Section -->
+                        <div class="section-card" id="logical_reasoning-section">
+                            <div class="section-header">
+                                <div class="section-toggle" onclick="toggleSection('logical_reasoning')">
+                                    <span class="section-icon">🧠</span>
+                                    <span class="section-name">Logical Reasoning / IQ</span>
+                                </div>
+                                <div class="toggle-switch" id="logical_reasoning-toggle">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                            <div class="section-content" id="logical_reasoning-content">
+                                <p style="color: #666; margin-bottom: 15px; font-size: 0.9rem;">
+                                    Pattern recognition, analytical thinking, problem solving, and intelligence testing.
+                                </p>
+
+                                <!-- Per-Section Generation Mode Toggle -->
+                                <div class="section-generation-mode" id="logical_reasoning-generation-mode" style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); border: 2px solid #0ea5e9; border-radius: 8px; padding: 12px 15px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                                    <span style="font-weight: 600; color: #0369a1; font-size: 0.9rem;">
+                                        📝 Generation Mode for this section:
+                                    </span>
+                                    <div style="display: flex; gap: 10px;">
+                                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 6px 12px; border: 2px solid #0ea5e9; border-radius: 6px; background: white; font-size: 0.85rem; transition: all 0.3s ease;" class="section-mode-btn active" data-mode="ai">
+                                            <input type="radio" name="logical_reasoning_generation_mode" value="ai" checked onchange="updateSectionGenerationMode('logical_reasoning', 'ai')" style="display: none;">
+                                            <span>🤖 AI</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 6px 12px; border: 2px solid #e1e5e9; border-radius: 6px; background: white; font-size: 0.85rem; transition: all 0.3s ease;" class="section-mode-btn" data-mode="manual">
+                                            <input type="radio" name="logical_reasoning_generation_mode" value="manual" onchange="updateSectionGenerationMode('logical_reasoning', 'manual')" style="display: none;">
+                                            <span>✍️ Manual</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="syllabus-section">
+                                    <label for="logical_reasoning_syllabus" style="font-weight: 600; color: #333; margin-bottom: 8px; display: block;">
+                                        📋 Syllabus/Topics (Optional)
+                                    </label>
+                                    <textarea
+                                        id="logical_reasoning_syllabus"
+                                        name="logical_reasoning_syllabus"
+                                        rows="3"
+                                        placeholder="Specify reasoning topics. E.g., 'Focus on pattern recognition, logical sequences, analytical puzzles, critical thinking, decision making scenarios, abstract reasoning'"
+                                        style="width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 6px; font-size: 0.9rem; line-height: 1.4; margin-bottom: 15px; resize: vertical;"
+                                        disabled
+                                    ></textarea>
+                                </div>
+
+                                <div class="question-types-grid">
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">☑️</div>
+                                        <div class="question-type-title">Single-Answer MCQ</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="logical_reasoning_mcq_count"
+                                                       min="0" max="50" value="3" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Marks</label>
+                                                <input type="number" name="logical_reasoning_mcq_marks"
+                                                       min="1" max="10" value="1" onchange="updateTotal()" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">☑️☑️</div>
+                                        <div class="question-type-title">Multi-Select MCQ</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="logical_reasoning_multi_select_count"
+                                                       min="0" max="20" value="0" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label title="Uses same marks as Single MCQ">Marks</label>
+                                                <input type="number" name="logical_reasoning_multi_select_marks"
+                                                       min="1" max="10" value="1" onchange="updateTotal()" disabled title="Uses same marks as Single MCQ">
+                                            </div>
+                                        </div>
+                                        <small class="help-text">Questions with multiple correct answers</small>
+                                    </div>
+
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">✍️</div>
+                                        <div class="question-type-title">Short Answer</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="logical_reasoning_short_count"
+                                                       min="0" max="20" value="1" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Marks</label>
+                                                <input type="number" name="logical_reasoning_short_marks"
+                                                       min="1" max="20" value="5" onchange="updateTotal()" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="question-type-card">
+                                        <div class="question-type-icon">📝</div>
+                                        <div class="question-type-title">Essay</div>
+                                        <div class="input-group">
+                                            <div class="form-group">
+                                                <label>Count</label>
+                                                <input type="number" name="logical_reasoning_essay_count"
+                                                       min="0" max="10" value="0" onchange="updateTotal()" disabled>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Marks</label>
+                                                <input type="number" name="logical_reasoning_essay_marks"
+                                                       min="1" max="50" value="10" onchange="updateTotal()" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Custom Sections Container -->
+                        <div id="custom-sections-container"></div>
+
+                        <!-- Add Custom Section Button -->
+                        <div class="add-custom-section" style="margin-top: 20px; margin-bottom: 20px;">
+                            <button type="button" class="btn btn-add-section" onclick="addCustomSection()" style="
+                                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                                color: white;
+                                padding: 15px 25px;
+                                border: none;
+                                border-radius: 10px;
+                                cursor: pointer;
+                                font-size: 1rem;
+                                font-weight: 600;
+                                display: flex;
+                                align-items: center;
+                                gap: 10px;
+                                transition: all 0.3s ease;
+                                box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+                            ">
+                                <span style="font-size: 1.3rem;">➕</span>
+                                Add Custom Section
+                            </button>
+                            <p style="color: #666; margin-top: 10px; font-size: 0.9rem;">
+                                Create your own custom exam sections with specific topics and requirements.
+                            </p>
+                        </div>
+
+                        <!-- Total Summary -->
+                        <div class="total-summary">
+                            <h4 style="color: #1e40af; margin-bottom: 10px;">📊 Exam Summary</h4>
+                            <div class="summary-grid">
+                                <div class="summary-item">
+                                    <div class="summary-value" id="totalQuestions">17</div>
+                                    <div class="summary-label">Total Questions</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-value" id="totalMarks">75</div>
+                                    <div class="summary-label">Total Marks</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-value" id="activeSections">1</div>
+                                    <div class="summary-label">Active Sections</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-value" id="estimatedTime">180</div>
+                                    <div class="summary-label">Time Limit (min)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Instructions -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            📝 Candidate Instructions
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label for="instructions">📋 Exam Instructions</label>
+                            <textarea id="instructions" name="instructions" rows="6" 
+                                    placeholder="Enter detailed instructions for candidates..."
+                                    >1. Read all questions carefully before starting.
+2. You have the specified time limit to complete all questions.
+3. All questions are mandatory unless stated otherwise.
+4. For multiple choice questions, select only one option.
+5. For essay questions, provide detailed and well-structured answers.
+6. Do not refresh the page during the exam as it may cause data loss.
+7. Contact support immediately if you face any technical issues.</textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <div>
+                        <span class="loading" id="loadingText">🤖 Generating questions using AI...</span>
+                    </div>
+                    <div style="display: flex; gap: 15px;">
+                        <a href="/admin" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            🚀 Generate Questions & Create Exam
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        const activeSections = new Set(['technical']);
+        let feedbackEnabled = true;
+        let negativeMarkingEnabled = false;
+        let negativeMarkingConfig = {};
+        let selectedLanguage = 'english';
+        let customSectionCounter = 0;
+        const customSections = new Map(); // Track custom sections
+
+        // Track per-section generation mode (ai or manual)
+        const sectionGenerationModes = {
+            'technical': 'ai',
+            'english': 'ai',
+            'mathematics': 'ai',
+            'bengali': 'ai',
+            'general_knowledge': 'ai',
+            'logical_reasoning': 'ai'
+        };
+
+        // Available emoji icons for custom sections
+        const sectionIcons = ['📚', '💼', '🎯', '📊', '🔬', '💡', '🎨', '📈', '🏆', '⭐', '🔧', '📝', '🎓', '💻', '🌟'];
+
+        // Update section generation mode
+        function updateSectionGenerationMode(sectionId, mode) {
+            sectionGenerationModes[sectionId] = mode;
+
+            // Update button styles
+            const container = document.getElementById(`${sectionId}-generation-mode`);
+            if (container) {
+                const buttons = container.querySelectorAll('.section-mode-btn');
+                buttons.forEach(btn => {
+                    const btnMode = btn.getAttribute('data-mode');
+                    if (btnMode === mode) {
+                        btn.classList.add('active');
+                        btn.style.borderColor = '#0ea5e9';
+                        btn.style.background = '#e0f2fe';
+                    } else {
+                        btn.classList.remove('active');
+                        btn.style.borderColor = '#e1e5e9';
+                        btn.style.background = 'white';
+                    }
+                });
+            }
+
+            console.log(`Section ${sectionId} generation mode set to: ${mode}`);
+
+            // Update AI instructions visibility when section mode changes
+            if (typeof toggleAIInstructionsVisibility === 'function') {
+                toggleAIInstructionsVisibility();
+            }
+        }
+
+        // Handle global generation method change - updates all sections
+        function handleGenerationMethodChange() {
+            const selectedMethod = document.querySelector('input[name="generation_method"]:checked').value;
+
+            // Update all predefined sections
+            const predefinedSections = ['technical', 'english', 'mathematics', 'bengali', 'general_knowledge', 'logical_reasoning'];
+            predefinedSections.forEach(section => {
+                // Set the radio button
+                const radio = document.querySelector(`input[name="${section}_generation_mode"][value="${selectedMethod}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    updateSectionGenerationMode(section, selectedMethod);
+                }
+            });
+
+            // Update custom sections too
+            customSections.forEach((info, sectionId) => {
+                const radio = document.querySelector(`input[name="${sectionId}_generation_mode"][value="${selectedMethod}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    updateSectionGenerationMode(sectionId, selectedMethod);
+                }
+            });
+
+            // Update AI instructions section visibility
+            toggleAIInstructionsVisibility();
+        }
+
+        function addCustomSection() {
+            customSectionCounter++;
+            const sectionId = `custom_${customSectionCounter}`;
+            const iconIndex = (customSectionCounter - 1) % sectionIcons.length;
+            const defaultIcon = sectionIcons[iconIndex];
+
+            const sectionHtml = `
+                <div class="section-card active" id="${sectionId}-section" data-custom="true">
+                    <div class="section-header">
+                        <div class="section-toggle" onclick="toggleSection('${sectionId}')">
+                            <span class="section-icon" id="${sectionId}-icon">${defaultIcon}</span>
+                            <input type="text"
+                                   id="${sectionId}-name-input"
+                                   class="section-name-input"
+                                   placeholder="Enter Section Name"
+                                   value="Custom Section ${customSectionCounter}"
+                                   onchange="updateCustomSectionName('${sectionId}')"
+                                   onclick="event.stopPropagation()"
+                                   style="
+                                       font-weight: 600;
+                                       font-size: 1.1rem;
+                                       color: #333;
+                                       border: 2px solid #e1e5e9;
+                                       border-radius: 6px;
+                                       padding: 8px 12px;
+                                       width: 250px;
+                                       transition: border-color 0.3s ease;
+                                   ">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <button type="button" onclick="removeCustomSection('${sectionId}')" style="
+                                background: #ef4444;
+                                color: white;
+                                border: none;
+                                border-radius: 6px;
+                                padding: 8px 12px;
+                                cursor: pointer;
+                                font-size: 0.85rem;
+                                font-weight: 600;
+                                transition: all 0.3s ease;
+                            " title="Remove this section">🗑️ Remove</button>
+                            <div class="toggle-switch active" id="${sectionId}-toggle">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-content active" id="${sectionId}-content" style="display: block;">
+                        <p style="color: #666; margin-bottom: 15px; font-size: 0.9rem;">
+                            Custom section - define your own topics and requirements below.
+                        </p>
+
+                        <!-- Per-Section Generation Mode Toggle -->
+                        <div class="section-generation-mode" id="${sectionId}-generation-mode" style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); border: 2px solid #0ea5e9; border-radius: 8px; padding: 12px 15px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                            <span style="font-weight: 600; color: #0369a1; font-size: 0.9rem;">
+                                📝 Generation Mode for this section:
+                            </span>
+                            <div style="display: flex; gap: 10px;">
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 6px 12px; border: 2px solid #0ea5e9; border-radius: 6px; background: #e0f2fe; font-size: 0.85rem; transition: all 0.3s ease;" class="section-mode-btn active" data-mode="ai">
+                                    <input type="radio" name="${sectionId}_generation_mode" value="ai" checked onchange="updateSectionGenerationMode('${sectionId}', 'ai')" style="display: none;">
+                                    <span>🤖 AI</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 6px 12px; border: 2px solid #e1e5e9; border-radius: 6px; background: white; font-size: 0.85rem; transition: all 0.3s ease;" class="section-mode-btn" data-mode="manual">
+                                    <input type="radio" name="${sectionId}_generation_mode" value="manual" onchange="updateSectionGenerationMode('${sectionId}', 'manual')" style="display: none;">
+                                    <span>✍️ Manual</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="syllabus-section" style="background: #f0fdf4; border-color: #10b981;">
+                            <label for="${sectionId}_syllabus" style="font-weight: 600; color: #333; margin-bottom: 8px; display: block;">
+                                📋 Section Description & Syllabus <span style="color: #ef4444;">*</span>
+                            </label>
+                            <textarea
+                                id="${sectionId}_syllabus"
+                                name="${sectionId}_syllabus"
+                                rows="4"
+                                placeholder="IMPORTANT: Describe what this section covers. The AI will generate questions based on this description. Be specific about topics, skills, or knowledge areas you want to test. E.g., 'Test knowledge of company policies, workplace safety regulations, customer service protocols, and professional ethics'"
+                                style="width: 100%; padding: 10px; border: 2px solid #10b981; border-radius: 6px; font-size: 0.9rem; line-height: 1.4; margin-bottom: 15px; resize: vertical;"
+                                required
+                            ></textarea>
+                            <p style="color: #059669; font-size: 0.85rem; margin-top: -10px;">
+                                💡 Tip: The more detailed your description, the better the AI-generated questions will be.
+                            </p>
+                        </div>
+
+                        <div class="question-types-grid">
+                            <div class="question-type-card">
+                                <div class="question-type-icon">☑️</div>
+                                <div class="question-type-title">Single-Answer MCQ</div>
+                                <div class="input-group">
+                                    <div class="form-group">
+                                        <label>Count</label>
+                                        <input type="number" name="${sectionId}_mcq_count"
+                                               min="0" max="50" value="5" onchange="updateTotal()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Marks</label>
+                                        <input type="number" name="${sectionId}_mcq_marks"
+                                               min="1" max="10" value="1" onchange="updateTotal()">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="question-type-card">
+                                <div class="question-type-icon">☑️☑️</div>
+                                <div class="question-type-title">Multi-Select MCQ</div>
+                                <div class="input-group">
+                                    <div class="form-group">
+                                        <label>Count</label>
+                                        <input type="number" name="${sectionId}_multi_select_count"
+                                               min="0" max="20" value="0" onchange="updateTotal()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label title="Uses same marks as Single MCQ">Marks</label>
+                                        <input type="number" name="${sectionId}_multi_select_marks"
+                                               min="1" max="10" value="1" onchange="updateTotal()" title="Uses same marks as Single MCQ">
+                                    </div>
+                                </div>
+                                <small class="help-text">Questions with multiple correct answers</small>
+                            </div>
+
+                            <div class="question-type-card">
+                                <div class="question-type-icon">✍️</div>
+                                <div class="question-type-title">Short Answer</div>
+                                <div class="input-group">
+                                    <div class="form-group">
+                                        <label>Count</label>
+                                        <input type="number" name="${sectionId}_short_count"
+                                               min="0" max="20" value="2" onchange="updateTotal()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Marks</label>
+                                        <input type="number" name="${sectionId}_short_marks"
+                                               min="1" max="20" value="5" onchange="updateTotal()">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="question-type-card">
+                                <div class="question-type-icon">📝</div>
+                                <div class="question-type-title">Essay</div>
+                                <div class="input-group">
+                                    <div class="form-group">
+                                        <label>Count</label>
+                                        <input type="number" name="${sectionId}_essay_count"
+                                               min="0" max="10" value="1" onchange="updateTotal()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Marks</label>
+                                        <input type="number" name="${sectionId}_essay_marks"
+                                               min="1" max="50" value="10" onchange="updateTotal()">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Add section to container
+            document.getElementById('custom-sections-container').insertAdjacentHTML('beforeend', sectionHtml);
+
+            // Track the custom section
+            customSections.set(sectionId, {
+                name: `Custom Section ${customSectionCounter}`,
+                icon: defaultIcon
+            });
+
+            // Add to active sections
+            activeSections.add(sectionId);
+
+            // Initialize generation mode for custom section (default to current global setting)
+            const globalMethod = document.querySelector('input[name="generation_method"]:checked')?.value || 'ai';
+            sectionGenerationModes[sectionId] = globalMethod;
+
+            // Add negative marking control for custom section if negative marking is enabled
+            if (negativeMarkingEnabled) {
+                addCustomSectionNegativeMarking(sectionId);
+            }
+
+            updateTotal();
+
+            // Scroll to the new section
+            document.getElementById(`${sectionId}-section`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Focus on the name input
+            setTimeout(() => {
+                document.getElementById(`${sectionId}-name-input`).focus();
+                document.getElementById(`${sectionId}-name-input`).select();
+            }, 300);
+        }
+
+        function updateCustomSectionName(sectionId) {
+            const nameInput = document.getElementById(`${sectionId}-name-input`);
+            const newName = nameInput.value.trim() || `Custom Section`;
+
+            if (customSections.has(sectionId)) {
+                customSections.get(sectionId).name = newName;
+            }
+
+            // Update negative marking label if it exists
+            const negativeMarkingLabel = document.querySelector(`#${sectionId}-negative-marking h5`);
+            if (negativeMarkingLabel) {
+                const icon = customSections.get(sectionId)?.icon || '📚';
+                negativeMarkingLabel.innerHTML = `${icon} ${newName}`;
+            }
+        }
+
+        function removeCustomSection(sectionId) {
+            if (confirm('Are you sure you want to remove this section?')) {
+                // Remove from DOM
+                const sectionElement = document.getElementById(`${sectionId}-section`);
+                if (sectionElement) {
+                    sectionElement.remove();
+                }
+
+                // Remove negative marking control
+                const negativeMarkingElement = document.getElementById(`${sectionId}-negative-marking`);
+                if (negativeMarkingElement) {
+                    negativeMarkingElement.remove();
+                }
+
+                // Remove from tracking
+                activeSections.delete(sectionId);
+                customSections.delete(sectionId);
+                delete negativeMarkingConfig[sectionId];
+                delete sectionGenerationModes[sectionId];
+
+                updateTotal();
+            }
+        }
+
+        function addCustomSectionNegativeMarking(sectionId) {
+            const sectionInfo = customSections.get(sectionId);
+            const sectionName = sectionInfo?.name || 'Custom Section';
+            const sectionIcon = sectionInfo?.icon || '📚';
+
+            const negativeMarkingHtml = `
+                <div class="section-negative-marking" id="${sectionId}-negative-marking">
+                    <h5>${sectionIcon} ${sectionName}</h5>
+                    <div class="negative-marking-toggle">
+                        <input type="checkbox" id="${sectionId}_negative_enabled" onchange="toggleSectionNegativeMarking('${sectionId}')">
+                        <label for="${sectionId}_negative_enabled">Enable negative marking for ${sectionName} MCQs</label>
+                    </div>
+                    <div class="negative-marking-input" id="${sectionId}-negative-input">
+                        <div class="negative-marks-field">
+                            <label>Negative marks per wrong answer:</label>
+                            <input type="number" id="${sectionId}_negative_marks" step="0.25" min="0" max="5" value="0.25">
+                            <label>marks</label>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('negative-marking-controls').insertAdjacentHTML('beforeend', negativeMarkingHtml);
+        }
+        
+        function selectLanguage(language) {
+            selectedLanguage = language;
+            
+            // Update radio button
+            document.querySelector(`input[name="exam_language"][value="${language}"]`).checked = true;
+            
+            // Update visual selection
+            document.querySelectorAll('.language-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelector(`input[name="exam_language"][value="${language}"]`).closest('.language-option').classList.add('selected');
+            
+            // Update preview
+            const previewContent = document.getElementById('language-preview-content');
+            if (language === 'english') {
+                previewContent.className = 'preview-content preview-english';
+                previewContent.innerHTML = `
+                    <strong>English Version Selected:</strong><br>
+                    • Technical, Mathematics, General Knowledge, Logical Reasoning: <span style="color: #3b82f6;">English</span><br>
+                    • Bengali Section: <span style="color: #f59e0b;">Bengali</span><br>
+                    • English Section: <span style="color: #3b82f6;">English</span>
+                `;
+            } else {
+                previewContent.className = 'preview-content preview-bengali';
+                previewContent.innerHTML = `
+                    <strong>Bengali Version Selected:</strong><br>
+                    • Technical, Mathematics, General Knowledge, Logical Reasoning: <span style="color: #f59e0b;">Bengali</span><br>
+                    • Bengali Section: <span style="color: #f59e0b;">Bengali</span><br>
+                    • English Section: <span style="color: #3b82f6;">English</span>
+                `;
+            }
+            
+            console.log(`🌐 Language selected: ${language}`);
+        }
+        
+        function toggleFeedback() {
+            const feedbackSwitch = document.getElementById('feedback-switch');
+            const feedbackInput = document.getElementById('show_feedback');
+            const previewText = document.getElementById('feedback-preview-text');
+            
+            feedbackEnabled = !feedbackEnabled;
+            
+            if (feedbackEnabled) {
+                feedbackSwitch.classList.add('enabled');
+                feedbackInput.value = 'on';
+                previewText.className = 'preview-enabled';
+                previewText.innerHTML = '✅ <strong>Feedback Enabled:</strong> Candidates will see their scores, correct answers, explanations, and detailed feedback for each question.';
+            } else {
+                feedbackSwitch.classList.remove('enabled');
+                feedbackInput.value = '';
+                previewText.className = 'preview-disabled';
+                previewText.innerHTML = '❌ <strong>Feedback Disabled:</strong> Candidates will only see a "Thank you for submission" message. No scores, answers, or feedback will be shown.';
+            }
+        }
+        
+        function toggleNegativeMarking() {
+            const negativeMarkingSwitch = document.getElementById('negative-marking-switch');
+            const negativeMarkingControls = document.getElementById('negative-marking-controls');
+
+            negativeMarkingEnabled = !negativeMarkingEnabled;
+
+            if (negativeMarkingEnabled) {
+                negativeMarkingSwitch.classList.add('enabled');
+                negativeMarkingControls.classList.add('active');
+
+                // Add negative marking controls for existing custom sections
+                customSections.forEach((info, sectionId) => {
+                    if (!document.getElementById(`${sectionId}-negative-marking`)) {
+                        addCustomSectionNegativeMarking(sectionId);
+                    }
+                });
+            } else {
+                negativeMarkingSwitch.classList.remove('enabled');
+                negativeMarkingControls.classList.remove('active');
+
+                // Reset all section negative marking (including custom sections)
+                const sections = ['technical', 'english', 'mathematics', 'bengali', 'general_knowledge', 'logical_reasoning'];
+
+                // Add custom sections to the reset list
+                customSections.forEach((info, sectionId) => {
+                    sections.push(sectionId);
+                });
+
+                sections.forEach(section => {
+                    const checkbox = document.getElementById(`${section}_negative_enabled`);
+                    const input = document.getElementById(`${section}-negative-input`);
+                    const card = document.getElementById(`${section}-negative-marking`);
+
+                    if (checkbox) checkbox.checked = false;
+                    if (input) input.classList.remove('active');
+                    if (card) card.classList.remove('enabled');
+                });
+
+                negativeMarkingConfig = {};
+            }
+        }
+        
+        function toggleSectionNegativeMarking(section) {
+            const checkbox = document.getElementById(`${section}_negative_enabled`);
+            const input = document.getElementById(`${section}-negative-input`);
+            const card = document.getElementById(`${section}-negative-marking`);
+            
+            if (checkbox.checked) {
+                input.classList.add('active');
+                card.classList.add('enabled');
+                
+                const negativeMarks = parseFloat(document.getElementById(`${section}_negative_marks`).value) || 0;
+                negativeMarkingConfig[section] = {
+                    enabled: true,
+                    mcq_negative_marks: negativeMarks
+                };
+            } else {
+                input.classList.remove('active');
+                card.classList.remove('enabled');
+                
+                if (negativeMarkingConfig[section]) {
+                    delete negativeMarkingConfig[section];
+                }
+            }
+        }
+        
+        function toggleSection(sectionName) {
+            const toggle = document.getElementById(`${sectionName}-toggle`);
+            const content = document.getElementById(`${sectionName}-content`);
+            const section = document.getElementById(`${sectionName}-section`);
+            const inputs = content.querySelectorAll('input[type="number"]');
+            const syllabusTextarea = content.querySelector('textarea');
+            
+            if (activeSections.has(sectionName)) {
+                activeSections.delete(sectionName);
+                toggle.classList.remove('active');
+                content.classList.remove('active');
+                content.style.display = 'none';
+                section.classList.remove('active');
+                
+                inputs.forEach(input => {
+                    input.disabled = true;
+                    if (input.type === 'number') {
+                        input.value = '0';
+                    }
+                });
+                
+                if (syllabusTextarea) {
+                    syllabusTextarea.disabled = true;
+                    syllabusTextarea.value = '';
+                }
+            } else {
+                activeSections.add(sectionName);
+                toggle.classList.add('active');
+                content.classList.add('active');
+                content.style.display = 'block';
+                section.classList.add('active');
+                
+                inputs.forEach(input => {
+                    input.disabled = false;
+                    if (input.name.includes('mcq_count')) {
+                        input.value = getDefaultValue(sectionName, 'mcq_count');
+                    } else if (input.name.includes('short_count')) {
+                        input.value = getDefaultValue(sectionName, 'short_count');
+                    } else if (input.name.includes('essay_count')) {
+                        input.value = getDefaultValue(sectionName, 'essay_count');
+                    } else if (input.name.includes('mcq_marks')) {
+                        input.value = getDefaultValue(sectionName, 'mcq_marks');
+                    } else if (input.name.includes('short_marks')) {
+                        input.value = getDefaultValue(sectionName, 'short_marks');
+                    } else if (input.name.includes('essay_marks')) {
+                        input.value = getDefaultValue(sectionName, 'essay_marks');
+                    }
+                });
+                
+                if (syllabusTextarea) {
+                    syllabusTextarea.disabled = false;
+                }
+            }
+            updateTotal();
+        }
+        
+        function getDefaultValue(section, type) {
+            const defaults = {
+                'technical': {
+                    'mcq_count': 10, 'short_count': 5, 'essay_count': 2,
+                    'mcq_marks': 2, 'short_marks': 5, 'essay_marks': 15
+                },
+                'english': {
+                    'mcq_count': 15, 'short_count': 3, 'essay_count': 1,
+                    'mcq_marks': 1, 'short_marks': 5, 'essay_marks': 15
+                },
+                'mathematics': {
+                    'mcq_count': 10, 'short_count': 5, 'essay_count': 0,
+                    'mcq_marks': 2, 'short_marks': 3, 'essay_marks': 10
+                },
+                'bengali': {
+                    'mcq_count': 10, 'short_count': 3, 'essay_count': 1,
+                    'mcq_marks': 1, 'short_marks': 5, 'essay_marks': 10
+                },
+                'general_knowledge': {
+                    'mcq_count': 20, 'short_count': 0, 'essay_count': 0,
+                    'mcq_marks': 1, 'short_marks': 3, 'essay_marks': 10
+                },
+                'logical_reasoning': {
+                    'mcq_count': 15, 'short_count': 3, 'essay_count': 0,
+                    'mcq_marks': 2, 'short_marks': 5, 'essay_marks': 15
+                }
+            };
+            return defaults[section]?.[type] || 0;
+        }
+        
+        function updateTotal() {
+            let totalQuestions = 0;
+            let totalMarks = 0;
+
+            activeSections.forEach(section => {
+                const mcqCountInput = document.querySelector(`input[name="${section}_mcq_count"]`);
+                const multiSelectCountInput = document.querySelector(`input[name="${section}_multi_select_count"]`);
+                const shortCountInput = document.querySelector(`input[name="${section}_short_count"]`);
+                const essayCountInput = document.querySelector(`input[name="${section}_essay_count"]`);
+                const mcqMarksInput = document.querySelector(`input[name="${section}_mcq_marks"]`);
+                const multiSelectMarksInput = document.querySelector(`input[name="${section}_multi_select_marks"]`);
+                const shortMarksInput = document.querySelector(`input[name="${section}_short_marks"]`);
+                const essayMarksInput = document.querySelector(`input[name="${section}_essay_marks"]`);
+
+                const mcqCount = mcqCountInput ? parseInt(mcqCountInput.value) || 0 : 0;
+                const multiSelectCount = multiSelectCountInput ? parseInt(multiSelectCountInput.value) || 0 : 0;
+                const shortCount = shortCountInput ? parseInt(shortCountInput.value) || 0 : 0;
+                const essayCount = essayCountInput ? parseInt(essayCountInput.value) || 0 : 0;
+                const mcqMarks = mcqMarksInput ? parseInt(mcqMarksInput.value) || 0 : 0;
+                const multiSelectMarks = multiSelectMarksInput ? parseInt(multiSelectMarksInput.value) || mcqMarks : mcqMarks;
+                const shortMarks = shortMarksInput ? parseInt(shortMarksInput.value) || 0 : 0;
+                const essayMarks = essayMarksInput ? parseInt(essayMarksInput.value) || 0 : 0;
+
+                totalQuestions += mcqCount + multiSelectCount + shortCount + essayCount;
+                totalMarks += (mcqCount * mcqMarks) + (multiSelectCount * multiSelectMarks) + (shortCount * shortMarks) + (essayCount * essayMarks);
+            });
+            
+            document.getElementById('totalQuestions').textContent = totalQuestions;
+            document.getElementById('totalMarks').textContent = totalMarks;
+            document.getElementById('activeSections').textContent = activeSections.size;
+            document.getElementById('estimatedTime').textContent = document.getElementById('time_limit').value;
+            
+            if (totalQuestions < 1) {
+                document.getElementById('totalQuestions').style.color = '#dc2626';
+            } else {
+                document.getElementById('totalQuestions').style.color = '#667eea';
+            }
+        }
+        
+        document.getElementById('examForm').addEventListener('submit', function(e) {
+            const generationMethod = document.querySelector('input[name="generation_method"]:checked').value;
+            const totalQuestions = parseInt(document.getElementById('totalQuestions').textContent);
+            const examLanguage = document.querySelector('input[name="exam_language"]:checked').value;
+            
+            if (totalQuestions < 1) {
+                e.preventDefault();
+                alert('❌ Please add at least one question to the exam by enabling sections.');
+                return;
+            }
+            
+            if (activeSections.size === 0) {
+                e.preventDefault();
+                alert('❌ Please enable at least one section.');
+                return;
+            }
+            
+            const title = document.getElementById('title').value.trim();
+            const department = document.getElementById('department').value.trim();
+            const position = document.getElementById('position').value.trim();
+            
+            if (!title || !department || !position) {
+                e.preventDefault();
+                alert('❌ Please fill in all required fields: Title, Department, and Position.');
+                return;
+            }
+            
+            const sectionsData = {};
+            activeSections.forEach(section => {
+                const mcqCount = parseInt(document.querySelector(`input[name="${section}_mcq_count"]`)?.value) || 0;
+                const multiSelectCount = parseInt(document.querySelector(`input[name="${section}_multi_select_count"]`)?.value) || 0;
+                const shortCount = parseInt(document.querySelector(`input[name="${section}_short_count"]`)?.value) || 0;
+                const essayCount = parseInt(document.querySelector(`input[name="${section}_essay_count"]`)?.value) || 0;
+                const mcqMarks = parseInt(document.querySelector(`input[name="${section}_mcq_marks"]`)?.value) || 0;
+                const multiSelectMarks = parseInt(document.querySelector(`input[name="${section}_multi_select_marks"]`)?.value) || mcqMarks;
+                const shortMarks = parseInt(document.querySelector(`input[name="${section}_short_marks"]`)?.value) || 0;
+                const essayMarks = parseInt(document.querySelector(`input[name="${section}_essay_marks"]`)?.value) || 0;
+
+                sectionsData[section] = {
+                    mcq_count: mcqCount,
+                    multi_select_count: multiSelectCount,
+                    short_count: shortCount,
+                    essay_count: essayCount,
+                    mcq_marks: mcqMarks,
+                    multi_select_marks: multiSelectMarks,
+                    short_marks: shortMarks,
+                    essay_marks: essayMarks,
+                    generation_mode: sectionGenerationModes[section] || 'ai'  // Include generation mode
+                };
+
+                // Add custom section name and flag if it's a custom section
+                if (customSections.has(section)) {
+                    const customInfo = customSections.get(section);
+                    sectionsData[section].is_custom = true;
+                    sectionsData[section].display_name = customInfo.name;
+                    sectionsData[section].icon = customInfo.icon;
+                }
+            });
+            
+            // Update negative marking config with current values
+            Object.keys(negativeMarkingConfig).forEach(section => {
+                const negativeMarks = parseFloat(document.getElementById(`${section}_negative_marks`).value) || 0;
+                negativeMarkingConfig[section].mcq_negative_marks = negativeMarks;
+            });
+            
+            const sectionsInput = document.createElement('input');
+            sectionsInput.type = 'hidden';
+            sectionsInput.name = 'sections_structure';
+            sectionsInput.value = JSON.stringify(sectionsData);
+            this.appendChild(sectionsInput);
+            
+            const negativeMarkingInput = document.createElement('input');
+            negativeMarkingInput.type = 'hidden';
+            negativeMarkingInput.name = 'negative_marking_config';
+            negativeMarkingInput.value = JSON.stringify(negativeMarkingConfig);
+            this.appendChild(negativeMarkingInput);
+            
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = 'generation_method';
+            methodInput.value = generationMethod;
+            this.appendChild(methodInput);
+
+            // Add multi-select scoring mode
+            const scoringMode = document.querySelector('input[name="multi_select_scoring_mode"]:checked')?.value || 'partial';
+            const scoringModeInput = document.createElement('input');
+            scoringModeInput.type = 'hidden';
+            scoringModeInput.name = 'multi_select_scoring_mode';
+            scoringModeInput.value = scoringMode;
+            this.appendChild(scoringModeInput);
+
+            // Add MCQ options count
+            const mcqOptionsCount = document.getElementById('mcq_options_count')?.value || '4';
+            const mcqOptionsInput = document.createElement('input');
+            mcqOptionsInput.type = 'hidden';
+            mcqOptionsInput.name = 'mcq_options_count';
+            mcqOptionsInput.value = mcqOptionsCount;
+            this.appendChild(mcqOptionsInput);
+
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingText = document.getElementById('loadingText');
+            
+            submitBtn.disabled = true;
+            
+            if (generationMethod === 'ai') {
+                submitBtn.innerHTML = `🤖 Generating Questions with AI (${examLanguage.toUpperCase()})...`;
+                loadingText.style.display = 'inline';
+                loadingText.textContent = `🤖 Generating questions using AI in ${examLanguage} language...`;
+            } else {
+                submitBtn.innerHTML = '📝 Creating Manual Exam Structure...';
+                loadingText.textContent = '📝 Setting up manual question interface...';
+            }
+            
+            console.log(`🚀 Submitting exam with language: ${examLanguage}`);
+        });
+        
+        function handleGenerationMethodChange() {
+            const method = document.querySelector('input[name="generation_method"]:checked').value;
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingText = document.getElementById('loadingText');
+            const examLanguage = document.querySelector('input[name="exam_language"]:checked').value;
+            
+            if (method === 'ai') {
+                submitBtn.innerHTML = '🚀 Generate Questions & Create Exam';
+                loadingText.textContent = `🤖 Generating questions using AI in ${examLanguage} language...`;
+            } else {
+                submitBtn.innerHTML = '📝 Create Exam Structure (Manual Questions)';
+                loadingText.textContent = '📝 Setting up manual question interface...';
+            }
+        }
+        
+        function toggleGenerationMethod(method) {
+            const aiRadio = document.querySelector('input[name="generation_method"][value="ai"]');
+            const manualRadio = document.querySelector('input[name="generation_method"][value="manual"]');
+            
+            if (method === 'ai') {
+                aiRadio.checked = true;
+                manualRadio.checked = false;
+            } else {
+                manualRadio.checked = true;
+                aiRadio.checked = false;
+            }
+            
+            handleGenerationMethodChange();
+        }
+        
+        // Handle difficulty level selection
+        function selectDifficultyLevel(level) {
+            document.querySelectorAll('.difficulty-option').forEach(option => {
+                option.classList.remove('selected');
+                option.style.borderColor = '#c4b5fd';
+                option.style.background = 'white';
+            });
+
+            const selectedOption = document.querySelector(`.difficulty-option[data-level="${level}"]`);
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+                selectedOption.style.borderColor = '#8b5cf6';
+                selectedOption.style.background = '#f5f3ff';
+                selectedOption.querySelector('input[type="radio"]').checked = true;
+            }
+        }
+
+        // Handle multi-select scoring mode selection styling
+        document.querySelectorAll('.scoring-mode-option input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.querySelectorAll('.scoring-mode-option').forEach(option => {
+                    option.classList.remove('selected');
+                    option.style.borderColor = '#d1d5db';
+                });
+
+                if (this.checked) {
+                    const selectedOption = this.closest('.scoring-mode-option');
+                    selectedOption.classList.add('selected');
+                    selectedOption.style.borderColor = '#10b981';
+                }
+            });
+        });
+
+        // Handle MCQ options count preview update
+        const OPTION_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+        function updateMcqOptionsPreview() {
+            const count = parseInt(document.getElementById('mcq_options_count').value) || 4;
+            const previewContainer = document.getElementById('mcq_options_preview');
+
+            if (previewContainer) {
+                let previewHTML = '<span style="color: #92400e; font-weight: 500;">Preview:</span>';
+                for (let i = 0; i < count; i++) {
+                    const bgColor = i === 0 ? '#10b981' : '#6b7280'; // First option (correct) is green
+                    previewHTML += `<span class="option-preview-letter" style="background: ${bgColor}; color: white; padding: 5px 10px; border-radius: 5px; font-weight: 600;">${OPTION_LETTERS[i]}</span>`;
+                }
+                previewContainer.innerHTML = previewHTML;
+            }
+        }
+
+        // Add event listener for MCQ options count change
+        document.addEventListener('DOMContentLoaded', function() {
+            const mcqOptionsSelect = document.getElementById('mcq_options_count');
+            if (mcqOptionsSelect) {
+                mcqOptionsSelect.addEventListener('change', updateMcqOptionsPreview);
+            }
+        });
+
+        // Toggle AI instructions section visibility based on generation method
+        function toggleAIInstructionsVisibility() {
+            const selectedMethod = document.querySelector('input[name="generation_method"]:checked')?.value || 'ai';
+            const aiInstructionsSection = document.getElementById('ai-instructions-section');
+
+            if (aiInstructionsSection) {
+                if (selectedMethod === 'manual') {
+                    // Check if any section is using AI
+                    let hasAISections = false;
+                    const predefinedSections = ['technical', 'english', 'mathematics', 'bengali', 'general_knowledge', 'logical_reasoning'];
+                    predefinedSections.forEach(section => {
+                        const aiRadio = document.querySelector(`input[name="${section}_generation_mode"][value="ai"]`);
+                        if (aiRadio && aiRadio.checked) {
+                            hasAISections = true;
+                        }
+                    });
+
+                    // Also check custom sections
+                    customSections.forEach((info, sectionId) => {
+                        const aiRadio = document.querySelector(`input[name="${sectionId}_generation_mode"][value="ai"]`);
+                        if (aiRadio && aiRadio.checked) {
+                            hasAISections = true;
+                        }
+                    });
+
+                    aiInstructionsSection.style.display = hasAISections ? 'block' : 'none';
+                } else {
+                    aiInstructionsSection.style.display = 'block';
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const technicalSection = document.getElementById('technical-section');
+            const technicalContent = document.getElementById('technical-content');
+            const technicalToggle = document.getElementById('technical-toggle');
+
+            if (technicalSection && technicalContent && technicalToggle) {
+                technicalSection.classList.add('active');
+                technicalContent.classList.add('active');
+                technicalContent.style.display = 'block';
+                technicalToggle.classList.add('active');
+
+                const technicalInputs = technicalContent.querySelectorAll('input[type="number"]');
+                technicalInputs.forEach(input => {
+                    input.disabled = false;
+                });
+            }
+
+            document.querySelectorAll('.section-toggle').forEach(toggle => {
+                const sectionName = toggle.closest('.section-card').id.replace('-section', '');
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleSection(sectionName);
+                });
+            });
+
+            document.querySelectorAll('.toggle-switch').forEach(toggle => {
+                const sectionName = toggle.id.replace('-toggle', '');
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleSection(sectionName);
+                });
+            });
+
+            // Add event listeners for negative marking inputs
+            const sections = ['technical', 'english', 'mathematics', 'bengali', 'general_knowledge', 'logical_reasoning'];
+            sections.forEach(section => {
+                const negativeMarksInput = document.getElementById(`${section}_negative_marks`);
+                if (negativeMarksInput) {
+                    negativeMarksInput.addEventListener('change', function() {
+                        if (negativeMarkingConfig[section]) {
+                            negativeMarkingConfig[section].mcq_negative_marks = parseFloat(this.value) || 0;
+                        }
+                    });
+                }
+            });
+
+            // Add event listeners for difficulty level options
+            document.querySelectorAll('.difficulty-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const level = this.getAttribute('data-level');
+                    selectDifficultyLevel(level);
+                });
+            });
+
+            // Initialize language selection
+            selectLanguage('english');
+
+            // Initialize AI instructions visibility
+            toggleAIInstructionsVisibility();
+
+            updateTotal();
+        });
+        
+        document.getElementById('time_limit').addEventListener('input', function() {
+            document.getElementById('estimatedTime').textContent = this.value;
+        });
+        
+        updateTotal();
+    </script>
+</body>
+</html>

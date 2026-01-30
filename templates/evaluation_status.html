@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Status - {{ exam_title }}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 40px 30px;
+        }
+
+        .header.pending {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+
+        .header.processing {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .header.completed {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .header.failed {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .status-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .exam-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .candidate-info {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-icon {
+            font-size: 1.5rem;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-box {
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .status-box.pending {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border: 2px solid #3b82f6;
+        }
+
+        .status-box.processing {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border: 2px solid #f59e0b;
+        }
+
+        .status-box.completed {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 2px solid #10b981;
+        }
+
+        .status-box.failed {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border: 2px solid #ef4444;
+        }
+
+        .status-box h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .status-box.pending h3 { color: #1e40af; }
+        .status-box.processing h3 { color: #92400e; }
+        .status-box.completed h3 { color: #065f46; }
+        .status-box.failed h3 { color: #991b1b; }
+
+        .status-box p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .status-box.pending p { color: #1e40af; }
+        .status-box.processing p { color: #92400e; }
+        .status-box.completed p { color: #065f46; }
+        .status-box.failed p { color: #991b1b; }
+
+        .progress-container {
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 4px;
+            animation: progress-animation 2s ease-in-out infinite;
+        }
+
+        @keyframes progress-animation {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        .queue-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .queue-stat {
+            text-align: center;
+        }
+
+        .queue-stat .value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+
+        .queue-stat .label {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .safe-message {
+            background: #ecfdf5;
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .safe-message h4 {
+            color: #065f46;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .safe-message p {
+            color: #065f46;
+            font-size: 0.95rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .footer {
+            background: #f8f9ff;
+            padding: 20px 30px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .footer p {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .refresh-timer {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 15px;
+        }
+
+        #countdown {
+            font-weight: bold;
+            color: #3b82f6;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+
+            .header {
+                padding: 30px 20px;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .queue-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header {{ status }}">
+            <div class="status-icon" id="status-icon">
+                {% if status == 'pending' %}
+                ⏳
+                {% elif status == 'processing' %}
+                ⚙️
+                {% elif status == 'completed' %}
+                ✅
+                {% elif status == 'failed' %}
+                ⚠️
+                {% else %}
+                📋
+                {% endif %}
+            </div>
+            <h1 id="status-title">
+                {% if status == 'pending' %}
+                Exam Submitted - Evaluation Queued
+                {% elif status == 'processing' %}
+                Evaluating Your Answers...
+                {% elif status == 'completed' %}
+                Evaluation Complete!
+                {% elif status == 'failed' %}
+                Evaluation Pending Review
+                {% else %}
+                Processing...
+                {% endif %}
+            </h1>
+            <div class="subtitle">{{ exam_title }}</div>
+        </div>
+
+        <div class="content">
+            <div class="candidate-info">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-icon">👤</div>
+                        <div class="info-label">Candidate Name</div>
+                        <div class="info-value">{{ candidate_name }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">🆔</div>
+                        <div class="info-label">Candidate ID</div>
+                        <div class="info-value">{{ candidate_id }}</div>
+                    </div>
+                    {% if time_taken %}
+                    <div class="info-item">
+                        <div class="info-icon">⏰</div>
+                        <div class="info-label">Time Taken</div>
+                        <div class="info-value">{{ time_taken }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Safe Message - Always show first -->
+            <div class="safe-message">
+                <h4>✅ Your Answers Are Saved!</h4>
+                <p>Your exam has been successfully submitted and your answers are safely stored. You can close this page at any time - your submission will not be lost.</p>
+            </div>
+
+            <!-- Status Box -->
+            <div class="status-box {{ status }}" id="status-box">
+                {% if status == 'pending' %}
+                <h3>📋 In Evaluation Queue</h3>
+                <p>{{ message }}</p>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+                {% if queue_position %}
+                <div class="queue-info">
+                    <div class="queue-stat">
+                        <div class="value" id="queue-position">{{ queue_position }}</div>
+                        <div class="label">Queue Position</div>
+                    </div>
+                </div>
+                {% endif %}
+                {% elif status == 'processing' %}
+                <h3>⚙️ Evaluating Your Answers</h3>
+                <p>Our AI is analyzing your responses. This usually takes 1-2 minutes.</p>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+                {% elif status == 'completed' %}
+                <h3>🎉 Evaluation Complete!</h3>
+                <p>Your exam has been fully evaluated. Click below to view your detailed results.</p>
+                {% elif status == 'failed' %}
+                <h3>📝 Manual Review Required</h3>
+                <p>{{ message }}</p>
+                <p>Your answers have been saved and will be reviewed by our team. You will be notified when results are available.</p>
+                {% endif %}
+            </div>
+
+            <!-- Actions -->
+            <div class="actions">
+                {% if status == 'completed' and show_feedback %}
+                <a href="/results/{{ result_id }}" class="btn btn-success" id="view-results-btn">
+                    📊 View Your Results
+                </a>
+                {% elif status == 'pending' or status == 'processing' %}
+                <button class="btn btn-primary" id="check-status-btn" onclick="checkStatus()">
+                    <span class="spinner hidden" id="spinner"></span>
+                    <span id="btn-text">🔄 Check Status</span>
+                </button>
+                {% endif %}
+                <a href="/" class="btn btn-secondary">🏠 Back to Home</a>
+            </div>
+
+            {% if status == 'pending' or status == 'processing' %}
+            <p class="refresh-timer">
+                Auto-checking in <span id="countdown">10</span> seconds...
+            </p>
+            {% endif %}
+        </div>
+
+        <div class="footer">
+            <p><strong>Result ID:</strong> {{ result_id[:8] if result_id else 'N/A' }}...</p>
+            <p>Save this page URL to check your results later: <code id="result-url"></code></p>
+        </div>
+    </div>
+
+    <script>
+        const resultId = '{{ result_id }}';
+        const showFeedback = {{ 'true' if show_feedback else 'false' }};
+        let countdown = 10;
+        let countdownInterval;
+        let isChecking = false;
+
+        // Set result URL
+        document.getElementById('result-url').textContent = window.location.origin + '/results/' + resultId;
+
+        // Auto-refresh for pending/processing status
+        {% if status == 'pending' or status == 'processing' %}
+        startCountdown();
+        {% endif %}
+
+        function startCountdown() {
+            countdownInterval = setInterval(() => {
+                countdown--;
+                const countdownEl = document.getElementById('countdown');
+                if (countdownEl) {
+                    countdownEl.textContent = countdown;
+                }
+
+                if (countdown <= 0) {
+                    countdown = 10;
+                    checkStatus();
+                }
+            }, 1000);
+        }
+
+        async function checkStatus() {
+            if (isChecking) return;
+            isChecking = true;
+
+            const spinner = document.getElementById('spinner');
+            const btnText = document.getElementById('btn-text');
+            const btn = document.getElementById('check-status-btn');
+
+            if (spinner) spinner.classList.remove('hidden');
+            if (btnText) btnText.textContent = 'Checking...';
+            if (btn) btn.disabled = true;
+
+            try {
+                const response = await fetch(`/api/evaluation-status/${resultId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    updateStatusUI(data);
+
+                    if (data.status === 'completed') {
+                        clearInterval(countdownInterval);
+                        // Redirect to results if feedback enabled
+                        if (data.can_view_results) {
+                            window.location.href = `/results/${resultId}`;
+                        } else {
+                            window.location.reload();
+                        }
+                    } else if (data.status === 'failed') {
+                        clearInterval(countdownInterval);
+                        window.location.reload();
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking status:', error);
+            } finally {
+                isChecking = false;
+                if (spinner) spinner.classList.add('hidden');
+                if (btnText) btnText.textContent = '🔄 Check Status';
+                if (btn) btn.disabled = false;
+                countdown = 10;
+            }
+        }
+
+        function updateStatusUI(data) {
+            const queuePosition = document.getElementById('queue-position');
+            if (queuePosition && data.queue_position !== undefined) {
+                queuePosition.textContent = data.queue_position;
+            }
+
+            // Update status icon based on current state
+            const statusIcon = document.getElementById('status-icon');
+            if (statusIcon) {
+                if (data.status === 'processing') {
+                    statusIcon.textContent = '⚙️';
+                } else if (data.status === 'completed') {
+                    statusIcon.textContent = '✅';
+                }
+            }
+        }
+
+        // Prevent accidental navigation
+        window.addEventListener('beforeunload', function(e) {
+            // Don't show warning - answers are already saved
+        });
+
+        // Clear exam data from localStorage
+        try {
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('exam_') || key.includes('answer')) {
+                    localStorage.removeItem(key);
+                }
+            });
+        } catch (e) {
+            console.log('Could not clear localStorage:', e);
+        }
+
+        // Copy URL functionality
+        document.getElementById('result-url').addEventListener('click', function() {
+            const url = window.location.origin + '/results/' + resultId;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Result URL copied to clipboard!');
+            });
+        });
+
+        // Add bookmark reminder
+        {% if status == 'pending' or status == 'processing' %}
+        setTimeout(() => {
+            const reminder = document.createElement('div');
+            reminder.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: #1e40af;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                z-index: 1000;
+                max-width: 300px;
+                animation: slideIn 0.5s ease-out;
+            `;
+            reminder.innerHTML = `
+                <strong>💡 Tip:</strong><br>
+                Bookmark this page to check your results later!
+                <button onclick="this.parentElement.remove()" style="
+                    position: absolute;
+                    top: 5px;
+                    right: 10px;
+                    background: none;
+                    border: none;
+                    color: white;
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                ">×</button>
+            `;
+
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            document.body.appendChild(reminder);
+
+            setTimeout(() => reminder.remove(), 10000);
+        }, 3000);
+        {% endif %}
+    </script>
+</body>
+</html>

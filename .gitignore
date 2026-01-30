@@ -1,0 +1,9 @@
+previous-version/
+__pycache__/
+uploads/
+.claude/
+.cache
+.env
+.venv
+env/
+.venv/

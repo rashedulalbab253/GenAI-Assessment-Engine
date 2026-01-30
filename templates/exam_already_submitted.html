@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Already Submitted</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✅</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 40px 30px;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .candidate-info {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-icon {
+            font-size: 1.5rem;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .message-box {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .message-box h3 {
+            color: #065f46;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .message-box p {
+            color: #065f46;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .info-box {
+            background: #f0f9ff;
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .info-box h3 {
+            color: #1e40af;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .info-box ul {
+            color: #1e40af;
+            list-style-position: inside;
+            line-height: 1.8;
+        }
+
+        .info-box li {
+            margin-bottom: 8px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .footer {
+            background: #f8f9ff;
+            padding: 20px 30px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .footer p {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+
+            .header {
+                padding: 30px 20px;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="success-icon">✅</div>
+            <h1>Exam Already Submitted</h1>
+            <div class="subtitle">Your exam was submitted successfully</div>
+        </div>
+
+        <div class="content">
+            <div class="candidate-info">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-icon">👤</div>
+                        <div class="info-label">Candidate Name</div>
+                        <div class="info-value">{{ candidate_name }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">🆔</div>
+                        <div class="info-label">Candidate ID</div>
+                        <div class="info-value">{{ candidate_id }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="message-box">
+                <h3>Submission Confirmed</h3>
+                <p><strong>{{ message }}</strong></p>
+                <p>Your answers have been securely recorded and are being evaluated.</p>
+            </div>
+
+            <div class="info-box">
+                <h3>What happens next?</h3>
+                <ul>
+                    <li><strong>Evaluation:</strong> Your answers are being reviewed by our assessment system</li>
+                    <li><strong>Results:</strong> You will be notified about your results through the provided contact information</li>
+                    <li><strong>Next Steps:</strong> If successful, you will be contacted for the next stage of the process</li>
+                </ul>
+            </div>
+
+            <div class="actions">
+                <a href="/" class="btn btn-primary">Back to Home</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Note:</strong> Each exam can only be submitted once. If you have any questions about your submission, please contact the administrator.</p>
+        </div>
+    </div>
+
+    <script>
+        // Prevent back navigation
+        window.history.replaceState(null, '', window.location.href);
+        window.addEventListener('popstate', function() {
+            window.history.replaceState(null, '', window.location.href);
+        });
+    </script>
+</body>
+</html>

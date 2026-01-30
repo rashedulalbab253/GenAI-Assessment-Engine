@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Submitted - {{ exam_title }}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            text-align: center;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 40px 30px;
+        }
+        
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: bounce 1s ease-in-out;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .exam-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        
+        .candidate-info {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-icon {
+            font-size: 1.5rem;
+        }
+        
+        .info-label {
+            font-size: 0.85rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .message-box {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .message-box h3 {
+            color: #1e40af;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .message-box p {
+            color: #1e40af;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .next-steps {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        
+        .next-steps h3 {
+            color: #92400e;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        
+        .next-steps ul {
+            color: #92400e;
+            list-style-position: inside;
+            line-height: 1.8;
+        }
+        
+        .next-steps li {
+            margin-bottom: 8px;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .footer {
+            background: #f8f9ff;
+            padding: 20px 30px;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        .footer p {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .container {
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .exam-title {
+                font-size: 1.2rem;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="success-icon">✅</div>
+            <h1>Exam Submitted Successfully!</h1>
+            <div class="subtitle">Thank you for completing the examination</div>
+        </div>
+        
+        <div class="content">
+            <div class="exam-title">{{ exam_title }}</div>
+            
+            <div class="candidate-info">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-icon">👤</div>
+                        <div class="info-label">Candidate Name</div>
+                        <div class="info-value">{{ candidate_name }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">🆔</div>
+                        <div class="info-label">Candidate ID</div>
+                        <div class="info-value">{{ candidate_id }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">⏰</div>
+                        <div class="info-label">Time Taken</div>
+                        <div class="info-value">{{ time_taken }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">📅</div>
+                        <div class="info-label">Submitted At</div>
+                        <div class="info-value" id="current-time"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="message-box">
+                <h3>📧 Submission Confirmation</h3>
+                <p><strong>Your exam has been successfully submitted and recorded.</strong></p>
+                <p>Your answers have been securely saved and will be reviewed by our evaluation team.</p>
+                <p>You will be notified about the results through the provided contact information.</p>
+            </div>
+            
+            <div class="next-steps">
+                <h3>📋 What Happens Next?</h3>
+                <ul>
+                    <li><strong>Review Process:</strong> Your responses will be carefully evaluated by our assessment team</li>
+                    <li><strong>Notification:</strong> You will be contacted via email or phone with your results</li>
+                    <li><strong>Next Steps:</strong> If successful, you will be contacted for the next stage of the recruitment process</li>
+                    <li><strong>Support:</strong> If you have any questions, please contact the recruitment team</li>
+                </ul>
+            </div>
+            
+            <div class="actions">
+                <a href="/" class="btn btn-primary">🏠 Back to Home</a>
+                <button onclick="window.print()" class="btn btn-secondary">🖨️ Print Confirmation</button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Important:</strong> Please keep this confirmation for your records. Your submission ID and timestamp serve as proof of exam completion.</p>
+            <p>If you experience any issues or have questions about your submission, please contact our support team immediately.</p>
+        </div>
+    </div>
+    
+    <script>
+        // Display current time
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+            document.getElementById('current-time').textContent = timeString;
+        }
+        
+        // Update time immediately and then every second
+        updateCurrentTime();
+        setInterval(updateCurrentTime, 1000);
+        
+        // Clear any saved exam data
+        try {
+            // Clear any exam-related localStorage data
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('exam_') || key.includes('answer')) {
+                    localStorage.removeItem(key);
+                }
+            });
+        } catch (e) {
+            console.log('Could not clear localStorage:', e);
+        }
+        
+        // Prevent back navigation to exam
+        window.history.replaceState(null, '', window.location.href);
+        window.addEventListener('popstate', function() {
+            window.history.replaceState(null, '', window.location.href);
+        });
+        
+        // Disable context menu and some shortcuts
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.keyCode === 123 || 
+                (e.ctrlKey && e.shiftKey && e.keyCode === 73) || 
+                (e.ctrlKey && e.keyCode === 85)) {
+                e.preventDefault();
+            }
+        });
+        
+        // Add confirmation animation
+        function showConfetti() {
+            const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
+            const confettiCount = 30;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.cssText = `
+                        position: fixed;
+                        top: -10px;
+                        left: ${Math.random() * 100}%;
+                        width: 8px;
+                        height: 8px;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        pointer-events: none;
+                        z-index: 1000;
+                        animation: confetti-fall 3s ease-out forwards;
+                    `;
+                    
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }, i * 100);
+            }
+        }
+        
+        // Add confetti animation CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes confetti-fall {
+                0% {
+                    transform: translateY(-10px) rotate(0deg);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Trigger confetti after page load
+        window.addEventListener('load', function() {
+            setTimeout(showConfetti, 500);
+        });
+        
+        // Print optimization
+        window.addEventListener('beforeprint', function() {
+            document.title = `Exam_Confirmation_{{ candidate_name.replace(' ', '_') }}_{{ exam_title.replace(' ', '_') }}`;
+        });
+        
+        // Auto-save confirmation details
+        const confirmationData = {
+            candidate_name: '{{ candidate_name }}',
+            candidate_id: '{{ candidate_id }}',
+            exam_title: '{{ exam_title }}',
+            time_taken: '{{ time_taken }}',
+            submitted_at: new Date().toISOString()
+        };
+        
+        try {
+            localStorage.setItem('last_exam_confirmation', JSON.stringify(confirmationData));
+        } catch (e) {
+            console.log('Could not save confirmation data:', e);
+        }
+        
+        // Add download confirmation function
+        function downloadConfirmation() {
+            const content = `EXAM SUBMISSION CONFIRMATION
+============================
+
+Exam Title: {{ exam_title }}
+Candidate Name: {{ candidate_name }}
+Candidate ID: {{ candidate_id }}
+Time Taken: {{ time_taken }}
+Submitted At: ${new Date().toLocaleString()}
+
+Status: Successfully Submitted
+
+NEXT STEPS:
+- Your responses will be evaluated by our assessment team
+- Results will be available within 3-5 business days
+- You will be contacted via email or phone with results
+- If successful, you will be contacted for the next recruitment stage
+
+Thank you for completing the examination!
+
+---
+This serves as your official submission confirmation.
+Please keep this for your records.`;
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Exam_Confirmation_{{ candidate_name.replace(' ', '_') }}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+        
+        // Add download button if needed
+        const actionsDiv = document.querySelector('.actions');
+        if (actionsDiv) {
+            const downloadBtn = document.createElement('button');
+            downloadBtn.className = 'btn btn-secondary';
+            downloadBtn.innerHTML = '💾 Download Confirmation';
+            downloadBtn.onclick = downloadConfirmation;
+            actionsDiv.appendChild(downloadBtn);
+        }
+    </script>
+</body>
+</html>

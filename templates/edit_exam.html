@@ -1,0 +1,3155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Exam: {{ exam.title }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid white;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .nav-link:hover {
+            background: white;
+            color: #667eea;
+        }
+        
+        .nav-link.primary {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .exam-info {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .exam-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 8px;
+        }
+        
+        .detail-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .detail-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+        
+        .alert-info {
+            background: #f0f9ff;
+            color: #1e40af;
+            border-color: #3b82f6;
+        }
+        
+        .alert-warning {
+            background: #fffbeb;
+            color: #92400e;
+            border-color: #f59e0b;
+        }
+        
+        .questions-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: #f8f9ff;
+            padding: 20px 25px;
+            border-bottom: 2px solid #e1e5e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .sections-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .section-tab {
+            padding: 8px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .section-tab:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+        
+        .section-questions {
+            display: none;
+        }
+        
+        .section-questions.active {
+            display: block;
+        }
+        
+        .question-card {
+            border-bottom: 1px solid #f0f0f0;
+            padding: 25px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .question-card:hover {
+            background: #f8f9ff;
+        }
+        
+        .question-card:last-child {
+            border-bottom: none;
+        }
+        
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .question-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .question-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .question-type {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .type-mcq {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .type-short {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .type-essay {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .question-marks {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .section-badge {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        
+        .question-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-edit {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+        
+        .question-content {
+            margin-bottom: 15px;
+        }
+        
+        .question-text {
+            font-size: 1.1rem;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        /* NEW: Question Images Display */
+        .question-images-display {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            border: 1px solid #e1e5e9;
+        }
+        
+        .question-image-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .question-image-item {
+            text-align: center;
+            max-width: 300px;
+        }
+        
+        .question-image-item img {
+            max-width: 100%;
+            height: auto;
+            max-height: 200px;
+            border-radius: 8px;
+            border: 2px solid #e1e5e9;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .question-image-item img:hover {
+            transform: scale(1.05);
+        }
+        
+        .question-image-caption {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .options-list {
+            margin-left: 20px;
+        }
+        
+        .option-item {
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .option-item.correct {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+        }
+        
+        .option-item.incorrect {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .option-label {
+            font-weight: 600;
+            color: #667eea;
+            min-width: 25px;
+        }
+        
+        .expected-answer {
+            background: #f0f9ff;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        
+        .expected-answer h4 {
+            color: #1e40af;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .modal-title {
+            font-size: 1.3rem;
+            color: #333;
+        }
+        
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .options-editor {
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .option-editor {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .option-editor input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        .option-editor input[type="radio"],
+        .option-editor input[type="checkbox"] {
+            width: auto;
+            flex: none;
+            min-width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .option-editor input[type="checkbox"] {
+            accent-color: #10b981;
+        }
+
+        /* Multi-select checkbox visibility control */
+        .edit-checkbox-hidden {
+            display: none !important;
+        }
+
+        .edit-checkbox-visible {
+            display: inline-block !important;
+        }
+
+        .edit-radio-hidden {
+            display: none !important;
+        }
+
+        .edit-radio-visible {
+            display: inline-block !important;
+        }
+        
+        .finalize-section {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .finalize-section h3 {
+            color: #1e40af;
+            margin-bottom: 15px;
+        }
+        
+        .finalize-section p {
+            color: #475569;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        /* Image Upload Styles */
+        .image-upload-section {
+            background: #f0f9ff;
+            border: 2px dashed #3b82f6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        
+        .image-preview {
+            margin-top: 15px;
+            max-width: 100%;
+        }
+        
+        .image-preview img {
+            max-width: 500px;
+            max-height: 300px;
+            border-radius: 8px;
+            border: 2px solid #e1e5e9;
+            margin: 10px 0;
+        }
+        
+        .image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .image-item {
+            position: relative;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 10px;
+            background: white;
+        }
+        
+        .image-item img {
+            max-width: 200px;
+            max-height: 150px;
+            object-fit: contain;
+        }
+        
+        .image-caption {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+        }
+        
+        .delete-image-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .delete-image-btn:hover {
+            background: #dc2626;
+        }
+        
+        .upload-btn {
+            background: #3b82f6;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .upload-btn:hover {
+            background: #2563eb;
+        }
+        
+        .upload-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+        
+        .file-input-label {
+            background: white;
+            border: 2px solid #e1e5e9;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .file-input-label:hover {
+            border-color: #3b82f6;
+            background: #f0f9ff;
+        }
+        
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .upload-progress {
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e1e5e9;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .exam-details {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .question-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .question-actions {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .modal-content {
+                margin: 10% auto;
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .sections-tabs {
+                justify-content: center;
+            }
+            
+            .question-image-container {
+                justify-content: center;
+            }
+        }
+
+        /* Regenerate Section Styles */
+        .section-header-with-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8ecff 100%);
+            border-bottom: 2px solid #e1e5e9;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+
+        .section-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title-group h3 {
+            margin: 0;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .section-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-generated {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-manual {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-unknown {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .btn-regenerate {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-regenerate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-regenerate:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-regenerate.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .btn-regenerate.loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin-left: -8px;
+            margin-top: -8px;
+            border: 2px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Regenerate Modal Styles */
+        .regenerate-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            overflow-y: auto;
+        }
+
+        .regenerate-modal-content {
+            background-color: white;
+            margin: 3% auto;
+            padding: 0;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .regenerate-modal-header {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .regenerate-modal-header h2 {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .regenerate-modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .regenerate-modal-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .regenerate-modal-body {
+            padding: 25px;
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .regenerate-form-group {
+            margin-bottom: 20px;
+        }
+
+        .regenerate-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .regenerate-form-group label small {
+            font-weight: normal;
+            color: #666;
+        }
+
+        .regenerate-form-group textarea,
+        .regenerate-form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .regenerate-form-group textarea:focus,
+        .regenerate-form-group select:focus {
+            outline: none;
+            border-color: #f59e0b;
+        }
+
+        .regenerate-form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .section-info-box {
+            background: #f8f9ff;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .section-info-box h4 {
+            margin: 0 0 10px 0;
+            color: #667eea;
+        }
+
+        .section-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed #e1e5e9;
+        }
+
+        .section-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .regenerate-warning {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            color: #9a3412;
+            font-size: 0.9rem;
+        }
+
+        .regenerate-modal-footer {
+            padding: 20px 25px;
+            border-top: 1px solid #e1e5e9;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .btn-cancel {
+            padding: 10px 20px;
+            background: #f3f4f6;
+            color: #374151;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-cancel:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-confirm-regenerate {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-confirm-regenerate:hover {
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-confirm-regenerate:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* Responsive styles for regenerate modal */
+        @media (max-width: 768px) {
+            .regenerate-modal-content {
+                margin: 2% auto;
+                width: 95%;
+                max-height: 95vh;
+            }
+
+            .regenerate-modal-body {
+                padding: 15px;
+            }
+
+            .regenerate-modal-header,
+            .regenerate-modal-footer {
+                padding: 15px;
+            }
+
+            .regenerate-form-group textarea {
+                min-height: 80px;
+            }
+        }
+
+        /* Failed section alert */
+        .alert-failed-sections {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-left: 4px solid #ef4444;
+            color: #991b1b;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-failed-sections strong {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .failed-section-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .failed-section-tag {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Print Options Modal Styles */
+        .print-options-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .print-options-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 0;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        .print-options-header {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .print-options-header h2 {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .print-options-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .print-options-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .print-options-body {
+            padding: 25px;
+        }
+
+        .print-option-group {
+            margin-bottom: 20px;
+        }
+
+        .print-option-group label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .print-option-group label:hover {
+            border-color: #17a2b8;
+            background: #e8f4f8;
+        }
+
+        .print-option-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .print-option-info {
+            flex: 1;
+        }
+
+        .print-option-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .print-option-desc {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .print-buttons-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-print-action {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-print-questions {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            color: white;
+        }
+
+        .btn-print-questions:hover {
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-print-with-answers {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+        }
+
+        .btn-print-with-answers:hover {
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+        }
+
+        .print-info-note {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>✏️ Edit Exam Questions</h1>
+            <div class="nav-links">
+                <button class="nav-link primary" onclick="showAddQuestionModal()">➕ Add Question</button>
+                <button class="nav-link" onclick="openPrintOptions()" title="Download or Print Questions">🖨️ Print / PDF</button>
+                <a href="/admin" class="nav-link">← Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Failed Sections Alert -->
+        {% if failed_sections and failed_sections|length > 0 %}
+        <div class="alert-failed-sections">
+            <strong>⚠️ Some sections failed to generate with AI</strong>
+            The following sections have placeholder questions. You can either edit them manually or click "Regenerate Section" to try AI generation again with updated syllabus/instructions.
+            <div class="failed-section-list">
+                {% for section in failed_sections %}
+                <span class="failed-section-tag">{{ section.replace('_', ' ').title() }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Manual Mode Alert -->
+        {% if manual_mode and (not failed_sections or failed_sections|length == 0) %}
+        <div class="alert alert-info">
+            <strong>📝 Manual Question Mode:</strong> You're in manual question creation mode. All questions need to be created or edited manually. Review each placeholder question and update it with your content, or use the "Regenerate Section" button to generate questions with AI.
+        </div>
+        {% endif %}
+        
+        <!-- Exam Information -->
+        <div class="exam-info">
+            <h2 style="color: #333; margin-bottom: 20px;">📋 {{ exam.title }}</h2>
+            <div class="exam-details">
+                <div class="detail-item">
+                    <div class="detail-value">{{ exam.department }}</div>
+                    <div class="detail-label">Department</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-value">{{ exam.position }}</div>
+                    <div class="detail-label">Position</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-value">{{ exam.time_limit }} min</div>
+                    <div class="detail-label">Time Limit</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-value">{{ questions|length }}</div>
+                    <div class="detail-label">Questions</div>
+                </div>
+            </div>
+            <p style="color: #666; line-height: 1.6;"><strong>Description:</strong> {{ exam.description or 'No description provided' }}</p>
+        </div>
+        
+        <!-- Questions List -->
+        <div class="questions-section">
+            <div class="section-header">
+                <h2 class="section-title">📝 Exam Questions</h2>
+                <span style="color: #666;">{% if manual_mode %}Review and edit manual questions{% else %}Review and edit generated questions{% endif %} before finalizing</span>
+            </div>
+            
+            <!-- Section Tabs -->
+            {% if sections %}
+            <div style="padding: 20px 25px 0;">
+                <div class="sections-tabs">
+                    <button class="section-tab active" onclick="showAllQuestions()">
+                        📋 All Questions ({{ questions|length }})
+                    </button>
+                    {% for section_name, section_questions in sections.items() %}
+                    <button class="section-tab" onclick="showSection('{{ section_name }}')">
+                        <span>
+                            {% if section_name == 'technical' %}⚙️
+                            {% elif section_name == 'english' %}🇬🇧
+                            {% elif section_name == 'mathematics' %}🔢
+                            {% elif section_name == 'bengali' %}🇧🇩
+                            {% elif section_name == 'general_knowledge' %}🌍
+                            {% elif section_name == 'logical_reasoning' %}🧠
+                            {% else %}📝{% endif %}
+                        </span>
+                        {{ section_name.replace('_', ' ').title() }} ({{ section_questions|length }})
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- All Questions View -->
+            <div id="all-questions" class="section-questions active">
+                {% if questions %}
+                {% for question in questions %}
+                <div class="question-card" data-question-id="{{ question.id }}" data-section="{{ question.section_type }}">
+                    <div class="question-header">
+                        <div class="question-meta">
+                            <div class="question-number">{{ loop.index }}</div>
+                            <span class="question-type type-{{ question.type }}">{{ question.type.upper() }}</span>
+                            <span class="question-marks">{{ question.marks }} marks</span>
+                            {% if question.section_type %}
+                            <span class="section-badge">{{ question.section_type.replace('_', ' ') }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="question-actions">
+                            <button class="action-btn btn-edit" onclick="editQuestion('{{ question.id }}')">
+                                ✏️ Edit
+                            </button>
+                            <button class="action-btn btn-delete" onclick="deleteQuestion('{{ question.id }}')">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="question-content">
+                        <div class="question-text">{{ question.question }}</div>
+                        
+                        <!-- Display Images if they exist -->
+                        {% if question.image_url or (question.images and question.images|length > 0) %}
+                        <div class="question-images-display">
+                            <div class="question-image-container">
+                                {% if question.image_url %}
+                                <div class="question-image-item">
+                                    <img src="{{ question.image_url }}" alt="Question figure" onclick="window.open('{{ question.image_url }}', '_blank')">
+                                    {% if question.image_caption %}
+                                    <div class="question-image-caption">{{ question.image_caption }}</div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                {% if question.images %}
+                                    {% for image in question.images %}
+                                    <div class="question-image-item">
+                                        <img src="{{ image.url }}" alt="Question figure" onclick="window.open('{{ image.url }}', '_blank')">
+                                        {% if image.caption %}
+                                        <div class="question-image-caption">{{ image.caption }}</div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if question.type == 'mcq' %}
+                        {% if question.is_multi_select %}
+                        <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; padding: 10px 15px; margin-bottom: 15px;">
+                            <span style="color: #065f46; font-weight: 600;">☑️☑️ Multi-Select MCQ - Correct:
+                            {% for idx in question.correct_answers %}{{ ['A', 'B', 'C', 'D', 'E', 'F'][idx] }}{% if not loop.last %}, {% endif %}{% endfor %}
+                            </span>
+                        </div>
+                        {% endif %}
+                        <div class="options-list">
+                            {% for option in question.options %}
+                            {% if question.is_multi_select %}
+                                {% set is_correct = loop.index0 in question.correct_answers %}
+                            {% else %}
+                                {% set is_correct = loop.index0 == question.correct_answer %}
+                            {% endif %}
+                            <div class="option-item {% if is_correct %}correct{% else %}incorrect{% endif %}">
+                                <span class="option-label">{{ ['A', 'B', 'C', 'D', 'E', 'F'][loop.index0] }})</span>
+                                <span>{{ option }}</span>
+                                {% if is_correct %}
+                                <span style="margin-left: auto; color: #10b981; font-weight: bold;">✓ Correct</span>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="expected-answer">
+                            <h4>Expected Answer:</h4>
+                            <p>{{ question.expected_answer or 'No expected answer provided' }}</p>
+                            {% if question.evaluation_criteria %}
+                            <h4 style="margin-top: 15px;">Evaluation Criteria:</h4>
+                            <p>{{ question.evaluation_criteria }}</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        {% if question.explanation %}
+                        <div class="expected-answer" style="background: #fef3c7; border-color: #f59e0b;">
+                            <h4 style="color: #92400e;">Explanation:</h4>
+                            <p style="color: #92400e;">{{ question.explanation }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div style="padding: 40px; text-align: center; color: #666;">
+                    <p>📝 No questions found for this exam.</p>
+                    <p>Start by adding questions using the "Add Question" button above.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Section-specific Views -->
+            {% for section_name, section_questions in sections.items() %}
+            <div id="section-{{ section_name }}" class="section-questions">
+                <!-- Section Header with Regenerate Button -->
+                <div class="section-header-with-actions">
+                    <div class="section-title-group">
+                        <h3>
+                            {% if section_name == 'technical' %}⚙️
+                            {% elif section_name == 'english' %}🇬🇧
+                            {% elif section_name == 'mathematics' %}🔢
+                            {% elif section_name == 'bengali' %}🇧🇩
+                            {% elif section_name == 'general_knowledge' %}🌍
+                            {% elif section_name == 'logical_reasoning' %}🧠
+                            {% else %}📝{% endif %}
+                            {{ section_name.replace('_', ' ').title() }}
+                        </h3>
+                        {% set section_config = sections_structure.get(section_name, {}) %}
+                        {% set gen_status = section_config.get('generation_status', 'unknown') %}
+                        <span class="section-status status-{{ gen_status }}">
+                            {% if gen_status == 'generated' %}✓ AI Generated
+                            {% elif gen_status == 'failed' %}✗ Generation Failed
+                            {% elif gen_status == 'manual' %}✎ Manual
+                            {% else %}? Unknown{% endif %}
+                        </span>
+                    </div>
+                    {% if not exam.is_finalized %}
+                    <button class="btn-regenerate" onclick="openRegenerateModal('{{ section_name }}')" title="Regenerate this section with AI">
+                        🔄 Regenerate Section
+                    </button>
+                    {% endif %}
+                </div>
+
+                {% for question in section_questions %}
+                <div class="question-card" data-question-id="{{ question.id }}" data-section="{{ question.section_type }}">
+                    <div class="question-header">
+                        <div class="question-meta">
+                            <div class="question-number">{{ loop.index }}</div>
+                            <span class="question-type type-{{ question.type }}">{{ question.type.upper() }}</span>
+                            <span class="question-marks">{{ question.marks }} marks</span>
+                        </div>
+                        <div class="question-actions">
+                            <button class="action-btn btn-edit" onclick="editQuestion('{{ question.id }}')">
+                                ✏️ Edit
+                            </button>
+                            <button class="action-btn btn-delete" onclick="deleteQuestion('{{ question.id }}')">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="question-content">
+                        <div class="question-text">{{ question.question }}</div>
+                        
+                        <!-- Display Images if they exist -->
+                        {% if question.image_url or (question.images and question.images|length > 0) %}
+                        <div class="question-images-display">
+                            <div class="question-image-container">
+                                {% if question.image_url %}
+                                <div class="question-image-item">
+                                    <img src="{{ question.image_url }}" alt="Question figure" onclick="window.open('{{ question.image_url }}', '_blank')">
+                                    {% if question.image_caption %}
+                                    <div class="question-image-caption">{{ question.image_caption }}</div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                {% if question.images %}
+                                    {% for image in question.images %}
+                                    <div class="question-image-item">
+                                        <img src="{{ image.url }}" alt="Question figure" onclick="window.open('{{ image.url }}', '_blank')">
+                                        {% if image.caption %}
+                                        <div class="question-image-caption">{{ image.caption }}</div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if question.type == 'mcq' %}
+                        {% if question.is_multi_select %}
+                        <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; padding: 10px 15px; margin-bottom: 15px;">
+                            <span style="color: #065f46; font-weight: 600;">☑️☑️ Multi-Select MCQ - Correct:
+                            {% for idx in question.correct_answers %}{{ ['A', 'B', 'C', 'D', 'E', 'F'][idx] }}{% if not loop.last %}, {% endif %}{% endfor %}
+                            </span>
+                        </div>
+                        {% endif %}
+                        <div class="options-list">
+                            {% for option in question.options %}
+                            {% if question.is_multi_select %}
+                                {% set is_correct = loop.index0 in question.correct_answers %}
+                            {% else %}
+                                {% set is_correct = loop.index0 == question.correct_answer %}
+                            {% endif %}
+                            <div class="option-item {% if is_correct %}correct{% else %}incorrect{% endif %}">
+                                <span class="option-label">{{ ['A', 'B', 'C', 'D', 'E', 'F'][loop.index0] }})</span>
+                                <span>{{ option }}</span>
+                                {% if is_correct %}
+                                <span style="margin-left: auto; color: #10b981; font-weight: bold;">✓ Correct</span>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="expected-answer">
+                            <h4>Expected Answer:</h4>
+                            <p>{{ question.expected_answer or 'No expected answer provided' }}</p>
+                            {% if question.evaluation_criteria %}
+                            <h4 style="margin-top: 15px;">Evaluation Criteria:</h4>
+                            <p>{{ question.evaluation_criteria }}</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        {% if question.explanation %}
+                        <div class="expected-answer" style="background: #fef3c7; border-color: #f59e0b;">
+                            <h4 style="color: #92400e;">Explanation:</h4>
+                            <p style="color: #92400e;">{{ question.explanation }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Finalize Exam Section -->
+        <div class="finalize-section">
+            <h3>🚀 Ready to Finalize?</h3>
+            <p>Once you finalize this exam, it will be available for candidates and cannot be edited further. Make sure all questions are reviewed and correct.</p>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <button class="btn btn-secondary" onclick="previewExam()">👁️ Preview Exam</button>
+                <button class="btn btn-success" onclick="finalizeExam()">🎯 Finalize & Generate Link</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Question Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">✏️ Edit Question</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            
+            <form id="editQuestionForm">
+                <input type="hidden" id="editQuestionId">
+                
+                <div class="form-group">
+                    <label for="editQuestionSection">Section</label>
+                    <select id="editQuestionSection">
+                        <!-- Sections will be populated dynamically -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editQuestionType">Question Type</label>
+                    <select id="editQuestionType" onchange="toggleEditOptions()">
+                        <option value="mcq">Multiple Choice Question</option>
+                        <option value="short">Short Answer Question</option>
+                        <option value="essay">Essay Question</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editQuestionText">Question Text</label>
+                    <textarea id="editQuestionText" rows="3" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editQuestionMarks">Marks</label>
+                    <input type="number" id="editQuestionMarks" min="1" max="100" required>
+                </div>
+                
+                <!-- IMAGE UPLOAD SECTION FOR EDIT MODAL -->
+                <div class="form-group" id="editImageSection">
+                    <label>Question Images</label>
+                    
+                    <!-- Current Images Display -->
+                    <div id="editCurrentImages" class="image-gallery"></div>
+                    
+                    <!-- Image Upload Section -->
+                    <div class="image-upload-section">
+                        <h4 style="margin-top: 0; color: #333;">📷 Add Image to Question</h4>
+                        <div class="file-input-wrapper">
+                            <label for="editImageFile" class="file-input-label">
+                                📁 Choose Image File
+                            </label>
+                            <input type="file" id="editImageFile" class="file-input" accept="image/*" onchange="previewEditImage(event)">
+                        </div>
+                        
+                        <div class="form-group" style="margin-top: 10px;">
+                            <input type="text" id="editImageCaption" placeholder="Image caption (optional)" style="width: 100%;">
+                        </div>
+                        
+                        <div id="editImagePreview" class="image-preview" style="display: none;">
+                            <img id="editPreviewImg" src="" alt="Preview">
+                        </div>
+                        
+                        <button type="button" class="upload-btn" id="editUploadBtn" onclick="uploadEditImage()" disabled>
+                            📤 Upload Image
+                        </button>
+                        
+                        <div id="editUploadProgress" class="upload-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="editProgressFill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="editMcqOptions" class="form-group">
+                    <!-- Multi-Select Toggle -->
+                    <div class="multi-select-toggle" style="display: flex; align-items: center; gap: 15px; padding: 15px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; margin-bottom: 15px;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 0;">
+                            <input type="checkbox" id="editIsMultiSelect" onchange="toggleEditMultiSelect()" style="width: 20px; height: 20px; accent-color: #10b981;">
+                            <span style="font-weight: 600; color: #065f46;">Multi-Select MCQ</span>
+                        </label>
+                        <span style="color: #059669; font-size: 0.85rem;">(Multiple correct answers allowed)</span>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <label id="editOptionsLabel" style="margin: 0;">Options (Select the correct answer)</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 0.85rem; color: #666;">Min: 2, Max: 6</span>
+                            <button type="button" onclick="addEditOption()" class="btn-add-option" style="background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">+ Add Option</button>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Options Container -->
+                    <div id="editOptionsContainer" class="options-editor">
+                        <!-- Options will be generated dynamically by JavaScript -->
+                    </div>
+                </div>
+                
+                <div id="editSubjectiveFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="editExpectedAnswer">Expected Answer Guidelines</label>
+                        <textarea id="editExpectedAnswer" rows="4" placeholder="Provide guidelines for what the answer should contain (key points, structure, etc.)"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editEvaluationCriteria">Evaluation Criteria</label>
+                        <textarea id="editEvaluationCriteria" rows="3" placeholder="How should this answer be evaluated? What are the scoring criteria?"></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editExplanation">Explanation (Optional)</label>
+                    <textarea id="editExplanation" rows="2" placeholder="Explanation for the correct answer or additional context"></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 25px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Add Question Modal -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">➕ Add New Question</h2>
+                <span class="close" onclick="closeAddModal()">&times;</span>
+            </div>
+            
+            <form id="addQuestionForm">
+                <div class="form-group">
+                    <label for="addQuestionSection">Section</label>
+                    <select id="addQuestionSection">
+                        <!-- Sections will be populated dynamically -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="addQuestionType">Question Type</label>
+                    <select id="addQuestionType" onchange="toggleAddOptions()">
+                        <option value="mcq">Multiple Choice Question</option>
+                        <option value="short">Short Answer Question</option>
+                        <option value="essay">Essay Question</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="addQuestionText">Question Text</label>
+                    <textarea id="addQuestionText" rows="3" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="addQuestionMarks">Marks</label>
+                    <input type="number" id="addQuestionMarks" min="1" max="100" value="5" required>
+                </div>
+                
+                <!-- IMAGE SECTION FOR ADD MODAL -->
+                <div class="form-group" id="addImageSection">
+                    <label>Question Images</label>
+                    
+                    <div class="image-upload-section">
+                        <h4 style="margin-top: 0; color: #333;">📷 Add Image to Question</h4>
+                        <p style="color: #666; font-size: 0.9rem;">Note: You can add images after creating the question.</p>
+                    </div>
+                </div>
+                
+                <div id="addMcqOptions" class="form-group">
+                    <!-- Multi-Select Toggle -->
+                    <div class="multi-select-toggle" style="display: flex; align-items: center; gap: 15px; padding: 15px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; margin-bottom: 15px;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 0;">
+                            <input type="checkbox" id="addIsMultiSelect" onchange="toggleAddMultiSelect()" style="width: 20px; height: 20px; accent-color: #10b981;">
+                            <span style="font-weight: 600; color: #065f46;">Multi-Select MCQ</span>
+                        </label>
+                        <span style="color: #059669; font-size: 0.85rem;">(Multiple correct answers allowed)</span>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <label id="addOptionsLabel" style="margin: 0;">Options (Select the correct answer)</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 0.85rem; color: #666;">Min: 2, Max: 6</span>
+                            <button type="button" onclick="addAddOption()" class="btn-add-option" style="background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">+ Add Option</button>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Options Container for Add -->
+                    <div id="addOptionsContainer" class="options-editor">
+                        <!-- Options will be generated dynamically by JavaScript -->
+                    </div>
+                </div>
+                
+                <div id="addSubjectiveFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="addExpectedAnswer">Expected Answer Guidelines</label>
+                        <textarea id="addExpectedAnswer" rows="4" placeholder="Provide guidelines for what the answer should contain (key points, structure, etc.)"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="addEvaluationCriteria">Evaluation Criteria</label>
+                        <textarea id="addEvaluationCriteria" rows="3" placeholder="How should this answer be evaluated? What are the scoring criteria?"></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="addExplanation">Explanation (Optional)</label>
+                    <textarea id="addExplanation" rows="2" placeholder="Explanation for the correct answer or additional context"></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 25px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">➕ Add Question</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        const examId = '{{ exam.id }}';
+        const questions = {{ questions | tojson }};
+        const sections = {{ sections | tojson }};
+        const manualMode = {{ manual_mode | tojson }};
+
+        // Section name formatting
+        const sectionIcons = {
+            'technical': '⚙️',
+            'english': '🇬🇧',
+            'mathematics': '🔢',
+            'bengali': '🇧🇩',
+            'general_knowledge': '🌍',
+            'logical_reasoning': '🧠'
+        };
+
+        function formatSectionName(key) {
+            const icon = sectionIcons[key] || '📋';
+            const name = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            return icon + ' ' + name;
+        }
+
+        // Populate section dropdowns on page load
+        function populateSectionDropdowns() {
+            const sectionKeys = Object.keys(sections);
+            const editSelect = document.getElementById('editQuestionSection');
+            const addSelect = document.getElementById('addQuestionSection');
+
+            // Clear existing options
+            editSelect.innerHTML = '';
+            addSelect.innerHTML = '';
+
+            // Add options for each section
+            sectionKeys.forEach(key => {
+                const option1 = document.createElement('option');
+                option1.value = key;
+                option1.textContent = formatSectionName(key);
+                editSelect.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = key;
+                option2.textContent = formatSectionName(key);
+                addSelect.appendChild(option2);
+            });
+
+            console.log('📋 Section dropdowns populated with:', sectionKeys);
+        }
+
+        // Call on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            populateSectionDropdowns();
+            initializeAddOptions(); // Initialize add modal with default 4 options
+        });
+
+        // ============================================
+        // DYNAMIC MCQ OPTIONS MANAGEMENT
+        // ============================================
+        const MIN_OPTIONS = 2;
+        const MAX_OPTIONS = 6;
+        const OPTION_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+        let editOptionCount = 0;
+        let addOptionCount = 0;
+
+        // Generate a single option field HTML
+        function createOptionFieldHTML(index, value = '', isCorrect = false, isMultiSelect = false, prefix = 'edit') {
+            const inputType = isMultiSelect ? 'checkbox' : 'radio';
+            const inputName = prefix === 'edit'
+                ? (isMultiSelect ? 'editCorrectAnswers' : 'editCorrectAnswer')
+                : (isMultiSelect ? 'addCorrectAnswers' : 'addCorrectAnswer');
+            const checkedAttr = isCorrect ? 'checked' : '';
+            const letter = OPTION_LETTERS[index] || String.fromCharCode(65 + index);
+
+            return `
+                <div class="option-editor" data-index="${index}" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <input type="${inputType}" name="${inputName}" value="${index}" ${checkedAttr}
+                           style="width: 18px; height: 18px; accent-color: #10b981; cursor: pointer;">
+                    <input type="text" class="${prefix}-option-input" data-index="${index}"
+                           placeholder="Option ${letter}" value="${value}" required
+                           style="flex: 1; padding: 10px; border: 2px solid #e1e5e9; border-radius: 6px;">
+                    <button type="button" onclick="remove${prefix.charAt(0).toUpperCase() + prefix.slice(1)}Option(${index})"
+                            class="btn-remove-option"
+                            style="background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
+                        ✕
+                    </button>
+                </div>
+            `;
+        }
+
+        // ============ EDIT MODAL FUNCTIONS ============
+
+        function generateEditOptions(options = [], correctAnswers = [], isMultiSelect = false) {
+            const container = document.getElementById('editOptionsContainer');
+            container.innerHTML = '';
+            editOptionCount = options.length || 4;
+
+            if (options.length === 0) {
+                options = ['', '', '', ''];
+                editOptionCount = 4;
+            }
+
+            for (let i = 0; i < options.length; i++) {
+                const isCorrect = correctAnswers.includes(i);
+                container.innerHTML += createOptionFieldHTML(i, options[i], isCorrect, isMultiSelect, 'edit');
+            }
+
+            updateEditRemoveButtons();
+        }
+
+        function addEditOption() {
+            if (editOptionCount >= MAX_OPTIONS) {
+                alert(`Maximum ${MAX_OPTIONS} options allowed`);
+                return;
+            }
+
+            const container = document.getElementById('editOptionsContainer');
+            const isMultiSelect = document.getElementById('editIsMultiSelect').checked;
+            container.innerHTML += createOptionFieldHTML(editOptionCount, '', false, isMultiSelect, 'edit');
+            editOptionCount++;
+            updateEditRemoveButtons();
+        }
+
+        function removeEditOption(index) {
+            if (editOptionCount <= MIN_OPTIONS) {
+                alert(`Minimum ${MIN_OPTIONS} options required`);
+                return;
+            }
+
+            const container = document.getElementById('editOptionsContainer');
+            const optionDiv = container.querySelector(`[data-index="${index}"]`);
+            if (optionDiv) {
+                optionDiv.remove();
+                editOptionCount--;
+                reindexEditOptions();
+                updateEditRemoveButtons();
+            }
+        }
+
+        function reindexEditOptions() {
+            const container = document.getElementById('editOptionsContainer');
+            const options = container.querySelectorAll('.option-editor');
+
+            options.forEach((opt, idx) => {
+                opt.setAttribute('data-index', idx);
+                const radio = opt.querySelector('input[type="radio"], input[type="checkbox"]');
+                const textInput = opt.querySelector('input[type="text"]');
+                const removeBtn = opt.querySelector('.btn-remove-option');
+
+                if (radio) radio.value = idx;
+                if (textInput) {
+                    textInput.setAttribute('data-index', idx);
+                    textInput.placeholder = `Option ${OPTION_LETTERS[idx]}`;
+                }
+                if (removeBtn) {
+                    removeBtn.setAttribute('onclick', `removeEditOption(${idx})`);
+                }
+            });
+        }
+
+        function updateEditRemoveButtons() {
+            const container = document.getElementById('editOptionsContainer');
+            const buttons = container.querySelectorAll('.btn-remove-option');
+            buttons.forEach(btn => {
+                btn.disabled = editOptionCount <= MIN_OPTIONS;
+                btn.style.opacity = editOptionCount <= MIN_OPTIONS ? '0.5' : '1';
+                btn.style.cursor = editOptionCount <= MIN_OPTIONS ? 'not-allowed' : 'pointer';
+            });
+        }
+
+        function getEditOptionsData() {
+            const container = document.getElementById('editOptionsContainer');
+            const inputs = container.querySelectorAll('.edit-option-input');
+            const options = [];
+            inputs.forEach(input => {
+                options.push(input.value);
+            });
+            return options;
+        }
+
+        function getEditCorrectAnswers() {
+            const isMultiSelect = document.getElementById('editIsMultiSelect').checked;
+            const container = document.getElementById('editOptionsContainer');
+
+            if (isMultiSelect) {
+                const checked = container.querySelectorAll('input[name="editCorrectAnswers"]:checked');
+                return Array.from(checked).map(cb => parseInt(cb.value));
+            } else {
+                const checked = container.querySelector('input[name="editCorrectAnswer"]:checked');
+                return checked ? [parseInt(checked.value)] : [];
+            }
+        }
+
+        // ============ ADD MODAL FUNCTIONS ============
+
+        function initializeAddOptions() {
+            generateAddOptions(['', '', '', ''], [], false);
+        }
+
+        function generateAddOptions(options = [], correctAnswers = [], isMultiSelect = false) {
+            const container = document.getElementById('addOptionsContainer');
+            container.innerHTML = '';
+            addOptionCount = options.length || 4;
+
+            if (options.length === 0) {
+                options = ['', '', '', ''];
+                addOptionCount = 4;
+            }
+
+            for (let i = 0; i < options.length; i++) {
+                const isCorrect = correctAnswers.includes(i);
+                container.innerHTML += createOptionFieldHTML(i, options[i], isCorrect, isMultiSelect, 'add');
+            }
+
+            if (!isMultiSelect && correctAnswers.length === 0) {
+                const firstRadio = container.querySelector('input[name="addCorrectAnswer"]');
+                if (firstRadio) firstRadio.checked = true;
+            }
+
+            updateAddRemoveButtons();
+        }
+
+        function addAddOption() {
+            if (addOptionCount >= MAX_OPTIONS) {
+                alert(`Maximum ${MAX_OPTIONS} options allowed`);
+                return;
+            }
+
+            const container = document.getElementById('addOptionsContainer');
+            const isMultiSelect = document.getElementById('addIsMultiSelect').checked;
+            container.innerHTML += createOptionFieldHTML(addOptionCount, '', false, isMultiSelect, 'add');
+            addOptionCount++;
+            updateAddRemoveButtons();
+        }
+
+        function removeAddOption(index) {
+            if (addOptionCount <= MIN_OPTIONS) {
+                alert(`Minimum ${MIN_OPTIONS} options required`);
+                return;
+            }
+
+            const container = document.getElementById('addOptionsContainer');
+            const optionDiv = container.querySelector(`[data-index="${index}"]`);
+            if (optionDiv) {
+                optionDiv.remove();
+                addOptionCount--;
+                reindexAddOptions();
+                updateAddRemoveButtons();
+            }
+        }
+
+        function reindexAddOptions() {
+            const container = document.getElementById('addOptionsContainer');
+            const options = container.querySelectorAll('.option-editor');
+
+            options.forEach((opt, idx) => {
+                opt.setAttribute('data-index', idx);
+                const radio = opt.querySelector('input[type="radio"], input[type="checkbox"]');
+                const textInput = opt.querySelector('input[type="text"]');
+                const removeBtn = opt.querySelector('.btn-remove-option');
+
+                if (radio) radio.value = idx;
+                if (textInput) {
+                    textInput.setAttribute('data-index', idx);
+                    textInput.placeholder = `Option ${OPTION_LETTERS[idx]}`;
+                }
+                if (removeBtn) {
+                    removeBtn.setAttribute('onclick', `removeAddOption(${idx})`);
+                }
+            });
+        }
+
+        function updateAddRemoveButtons() {
+            const container = document.getElementById('addOptionsContainer');
+            const buttons = container.querySelectorAll('.btn-remove-option');
+            buttons.forEach(btn => {
+                btn.disabled = addOptionCount <= MIN_OPTIONS;
+                btn.style.opacity = addOptionCount <= MIN_OPTIONS ? '0.5' : '1';
+                btn.style.cursor = addOptionCount <= MIN_OPTIONS ? 'not-allowed' : 'pointer';
+            });
+        }
+
+        function getAddOptionsData() {
+            const container = document.getElementById('addOptionsContainer');
+            const inputs = container.querySelectorAll('.add-option-input');
+            const options = [];
+            inputs.forEach(input => {
+                options.push(input.value);
+            });
+            return options;
+        }
+
+        function getAddCorrectAnswers() {
+            const isMultiSelect = document.getElementById('addIsMultiSelect').checked;
+            const container = document.getElementById('addOptionsContainer');
+
+            if (isMultiSelect) {
+                const checked = container.querySelectorAll('input[name="addCorrectAnswers"]:checked');
+                return Array.from(checked).map(cb => parseInt(cb.value));
+            } else {
+                const checked = container.querySelector('input[name="addCorrectAnswer"]:checked');
+                return checked ? [parseInt(checked.value)] : [];
+            }
+        }
+
+        // Toggle functions for multi-select
+        function toggleEditMultiSelect() {
+            const isMultiSelect = document.getElementById('editIsMultiSelect').checked;
+            const label = document.getElementById('editOptionsLabel');
+            label.textContent = isMultiSelect ? 'Options (Select ALL correct answers)' : 'Options (Select the correct answer)';
+
+            const options = getEditOptionsData();
+            generateEditOptions(options, [], isMultiSelect);
+        }
+
+        function toggleAddMultiSelect() {
+            const isMultiSelect = document.getElementById('addIsMultiSelect').checked;
+            const label = document.getElementById('addOptionsLabel');
+            label.textContent = isMultiSelect ? 'Options (Select ALL correct answers)' : 'Options (Select the correct answer)';
+
+            const options = getAddOptionsData();
+            generateAddOptions(options, [], isMultiSelect);
+        }
+
+        // ============================================
+        // END DYNAMIC MCQ OPTIONS MANAGEMENT
+        // ============================================
+
+        // IMAGE UPLOAD VARIABLES
+        let currentEditingQuestionId = null;
+        let selectedImageFile = null;
+
+        // Section navigation
+        function showAllQuestions() {
+            // Hide all section views
+            document.querySelectorAll('.section-questions').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show all questions view
+            document.getElementById('all-questions').classList.add('active');
+            
+            // Update tab styling
+            document.querySelectorAll('.section-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector('.section-tab').classList.add('active');
+        }
+        
+        function showSection(sectionName) {
+            // Hide all section views
+            document.querySelectorAll('.section-questions').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show specific section
+            document.getElementById(`section-${sectionName}`).classList.add('active');
+            
+            // Update tab styling
+            document.querySelectorAll('.section-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[onclick="showSection('${sectionName}')"]`).classList.add('active');
+        }
+        
+        function editQuestion(questionId) {
+            console.log('📝 Edit question called for:', questionId);
+            const question = questions.find(q => q.id === questionId);
+            if (!question) {
+                console.error('❌ Question not found:', questionId);
+                alert('Question not found!');
+                return;
+            }
+            console.log('📊 Question data:', question);
+
+            // SET CURRENT EDITING QUESTION ID FOR IMAGE UPLOAD
+            currentEditingQuestionId = questionId;
+
+            // Populate edit form
+            document.getElementById('editQuestionId').value = questionId;
+            document.getElementById('editQuestionSection').value = question.section_type || 'technical';
+            document.getElementById('editQuestionType').value = question.type;
+            document.getElementById('editQuestionText').value = question.question;
+            document.getElementById('editQuestionMarks').value = question.marks;
+            document.getElementById('editExplanation').value = question.explanation || '';
+
+            if (question.type === 'mcq') {
+                const isMultiSelect = question.is_multi_select === true;
+                console.log('🔀 Is multi-select:', isMultiSelect, 'Options count:', question.options?.length);
+
+                // Set the multi-select toggle checkbox
+                document.getElementById('editIsMultiSelect').checked = isMultiSelect;
+
+                // Update label text
+                const label = document.getElementById('editOptionsLabel');
+                label.textContent = isMultiSelect ? 'Options (Select ALL correct answers)' : 'Options (Select the correct answer)';
+
+                // Get correct answers array
+                let correctAnswers = [];
+                if (isMultiSelect && question.correct_answers) {
+                    correctAnswers = Array.isArray(question.correct_answers) ? question.correct_answers : [];
+                } else if (question.correct_answer !== null && question.correct_answer !== undefined) {
+                    correctAnswers = [question.correct_answer];
+                }
+
+                // Generate dynamic option fields
+                generateEditOptions(question.options || [], correctAnswers, isMultiSelect);
+            } else {
+                document.getElementById('editExpectedAnswer').value = question.expected_answer || '';
+                document.getElementById('editEvaluationCriteria').value = question.evaluation_criteria || '';
+
+                // Reset multi-select to default state for non-MCQ
+                document.getElementById('editIsMultiSelect').checked = false;
+                generateEditOptions([], [], false);
+            }
+
+            // Show/hide MCQ vs subjective fields
+            toggleEditOptions();
+
+            // LOAD IMAGES FOR THIS QUESTION
+            loadQuestionImages(questionId);
+
+            // Show the modal
+            document.getElementById('editModal').style.display = 'block';
+            console.log('✅ Edit modal opened');
+        }
+
+        // Toggle multi-select mode for Edit modal
+        function toggleEditMultiSelect() {
+            const isMultiSelect = document.getElementById('editIsMultiSelect').checked;
+            const singleSelectDiv = document.getElementById('editSingleSelectOptions');
+            const multiSelectDiv = document.getElementById('editMultiSelectOptions');
+            const label = document.getElementById('editOptionsLabel');
+
+            console.log('🔄 toggleEditMultiSelect called, isMultiSelect:', isMultiSelect);
+
+            if (isMultiSelect) {
+                // Hide radio buttons container, show checkboxes container
+                singleSelectDiv.style.display = 'none';
+                multiSelectDiv.style.display = 'block';
+                label.textContent = 'Options (Select ALL correct answers)';
+
+                // Copy option values from single-select to multi-select inputs
+                for (let i = 0; i < 4; i++) {
+                    const singleValue = document.getElementById('editOption' + i).value;
+                    document.getElementById('editOptionMulti' + i).value = singleValue;
+                }
+
+                // Clear radio selections
+                document.querySelectorAll('input[name="editCorrectAnswer"]').forEach(rb => { rb.checked = false; });
+            } else {
+                // Show radio buttons container, hide checkboxes container
+                singleSelectDiv.style.display = 'block';
+                multiSelectDiv.style.display = 'none';
+                label.textContent = 'Options (Select the correct answer)';
+
+                // Copy option values from multi-select to single-select inputs
+                for (let i = 0; i < 4; i++) {
+                    const multiValue = document.getElementById('editOptionMulti' + i).value;
+                    document.getElementById('editOption' + i).value = multiValue;
+                }
+
+                // Clear checkbox selections
+                document.querySelectorAll('input[name="editCorrectAnswers"]').forEach(cb => { cb.checked = false; });
+            }
+        }
+
+        // Toggle multi-select mode for Add modal
+        function toggleAddMultiSelect() {
+            const isMultiSelect = document.getElementById('addIsMultiSelect').checked;
+            const singleSelects = document.querySelectorAll('.add-single-select');
+            const multiSelects = document.querySelectorAll('.add-multi-select');
+            const label = document.getElementById('addOptionsLabel');
+
+            if (isMultiSelect) {
+                singleSelects.forEach(el => el.style.display = 'none');
+                multiSelects.forEach(el => el.style.display = 'inline-block');
+                label.textContent = 'Options (Select ALL correct answers)';
+            } else {
+                singleSelects.forEach(el => el.style.display = 'inline-block');
+                multiSelects.forEach(el => el.style.display = 'none');
+                label.textContent = 'Options (Select the correct answer)';
+            }
+        }
+        
+        // IMAGE FUNCTIONS
+        async function loadQuestionImages(questionId) {
+            try {
+                const response = await fetch(`/api/question-images/${questionId}`, {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayQuestionImages(data.images);
+                }
+            } catch (error) {
+                console.error('Error loading question images:', error);
+            }
+        }
+        
+        function displayQuestionImages(images) {
+            const container = document.getElementById('editCurrentImages');
+            container.innerHTML = '';
+            
+            if (!images || images.length === 0) {
+                container.innerHTML = '<p style="color: #666;">No images attached to this question.</p>';
+                return;
+            }
+            
+            images.forEach(image => {
+                const imageItem = document.createElement('div');
+                imageItem.className = 'image-item';
+                imageItem.innerHTML = `
+                    <button class="delete-image-btn" onclick="deleteQuestionImage('${image.id}')" title="Delete image">×</button>
+                    <img src="${image.url}" alt="${image.caption || 'Question image'}">
+                    ${image.caption ? `<div class="image-caption">${image.caption}</div>` : ''}
+                `;
+                container.appendChild(imageItem);
+            });
+        }
+        
+        function previewEditImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Validate file size
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('❌ File size exceeds 5MB limit');
+                    event.target.value = '';
+                    return;
+                }
+                
+                // Validate file type
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+                if (!allowedTypes.includes(file.type)) {
+                    alert('❌ Invalid file type. Please select an image file.');
+                    event.target.value = '';
+                    return;
+                }
+                
+                selectedImageFile = file;
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    document.getElementById('editPreviewImg').src = e.target.result;
+                    document.getElementById('editImagePreview').style.display = 'block';
+                    document.getElementById('editUploadBtn').disabled = false;
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        async function uploadEditImage() {
+            if (!selectedImageFile || !currentEditingQuestionId) {
+                alert('❌ Please select an image first');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', selectedImageFile);
+            
+            const caption = document.getElementById('editImageCaption').value.trim();
+            if (caption) {
+                formData.append('caption', caption);
+            }
+            
+            // Show progress
+            document.getElementById('editUploadProgress').style.display = 'block';
+            document.getElementById('editUploadBtn').disabled = true;
+            
+            try {
+                const response = await fetch(`/api/upload-question-image/${currentEditingQuestionId}`, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('✅ Image uploaded successfully!');
+                    
+                    // Reload images
+                    await loadQuestionImages(currentEditingQuestionId);
+                    
+                    // Reset form
+                    document.getElementById('editImageFile').value = '';
+                    document.getElementById('editImageCaption').value = '';
+                    document.getElementById('editImagePreview').style.display = 'none';
+                    document.getElementById('editUploadBtn').disabled = true;
+                    selectedImageFile = null;
+                    
+                    // Update progress bar
+                    document.getElementById('editProgressFill').style.width = '100%';
+                    setTimeout(() => {
+                        document.getElementById('editUploadProgress').style.display = 'none';
+                        document.getElementById('editProgressFill').style.width = '0%';
+                    }, 1000);
+                } else {
+                    alert('❌ Error uploading image: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('❌ Error uploading image: ' + error.message);
+            } finally {
+                document.getElementById('editUploadBtn').disabled = false;
+            }
+        }
+        
+        async function deleteQuestionImage(imageId) {
+            if (!confirm('Are you sure you want to delete this image?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/delete-question-image/${imageId}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('✅ Image deleted successfully!');
+                    // Reload images
+                    await loadQuestionImages(currentEditingQuestionId);
+                } else {
+                    alert('❌ Error deleting image: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('❌ Error deleting image: ' + error.message);
+            }
+        }
+        
+        function toggleEditOptions() {
+            const type = document.getElementById('editQuestionType').value;
+            const mcqOptions = document.getElementById('editMcqOptions');
+            const subjectiveFields = document.getElementById('editSubjectiveFields');
+            
+            if (type === 'mcq') {
+                mcqOptions.style.display = 'block';
+                subjectiveFields.style.display = 'none';
+                // Make MCQ options required
+                document.querySelectorAll('#editMcqOptions input[type="text"]').forEach(input => {
+                    input.required = true;
+                });
+                document.querySelectorAll('#editSubjectiveFields textarea').forEach(textarea => {
+                    textarea.required = false;
+                });
+            } else {
+                mcqOptions.style.display = 'none';
+                subjectiveFields.style.display = 'block';
+                // Make subjective fields required
+                document.querySelectorAll('#editMcqOptions input[type="text"]').forEach(input => {
+                    input.required = false;
+                });
+                document.querySelectorAll('#editSubjectiveFields textarea').forEach(textarea => {
+                    textarea.required = false; // Optional for now
+                });
+            }
+        }
+        
+        function toggleAddOptions() {
+            const type = document.getElementById('addQuestionType').value;
+            const mcqOptions = document.getElementById('addMcqOptions');
+            const subjectiveFields = document.getElementById('addSubjectiveFields');
+            
+            if (type === 'mcq') {
+                mcqOptions.style.display = 'block';
+                subjectiveFields.style.display = 'none';
+                document.querySelectorAll('#addMcqOptions input[type="text"]').forEach(input => {
+                    input.required = true;
+                });
+                document.querySelectorAll('#addSubjectiveFields textarea').forEach(textarea => {
+                    textarea.required = false;
+                });
+            } else {
+                mcqOptions.style.display = 'none';
+                subjectiveFields.style.display = 'block';
+                document.querySelectorAll('#addMcqOptions input[type="text"]').forEach(input => {
+                    input.required = false;
+                });
+                document.querySelectorAll('#addSubjectiveFields textarea').forEach(textarea => {
+                    textarea.required = false;
+                });
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+            // RESET IMAGE UPLOAD FIELDS
+            currentEditingQuestionId = null;
+            selectedImageFile = null;
+            document.getElementById('editImageFile').value = '';
+            document.getElementById('editImageCaption').value = '';
+            document.getElementById('editImagePreview').style.display = 'none';
+            document.getElementById('editUploadBtn').disabled = true;
+            document.getElementById('editCurrentImages').innerHTML = '';
+
+            // RESET MULTI-SELECT STATE TO DEFAULT (single-select)
+            document.getElementById('editIsMultiSelect').checked = false;
+            document.getElementById('editOptionsLabel').textContent = 'Options (Select the correct answer)';
+
+            // Reset to 4 empty options (default state)
+            generateEditOptions(['', '', '', ''], [], false);
+        }
+        
+        function closeAddModal() {
+            document.getElementById('addModal').style.display = 'none';
+            document.getElementById('addQuestionForm').reset();
+
+            // Reset multi-select state to default
+            document.getElementById('addIsMultiSelect').checked = false;
+            document.getElementById('addOptionsLabel').textContent = 'Options (Select the correct answer)';
+
+            // Reset to 4 empty options (default state)
+            initializeAddOptions();
+        }
+        
+        function showAddQuestionModal() {
+            document.getElementById('addModal').style.display = 'block';
+            toggleAddOptions();
+        }
+        
+        // Handle edit form submission
+        document.getElementById('editQuestionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const questionId = document.getElementById('editQuestionId').value;
+            const type = document.getElementById('editQuestionType').value;
+            
+            const questionData = {
+                type: type,
+                section_type: document.getElementById('editQuestionSection').value,
+                question: document.getElementById('editQuestionText').value,
+                marks: parseInt(document.getElementById('editQuestionMarks').value),
+                explanation: document.getElementById('editExplanation').value
+            };
+            
+            if (type === 'mcq') {
+                // Handle multi-select MCQ with dynamic options
+                const isMultiSelect = document.getElementById('editIsMultiSelect').checked;
+                questionData.is_multi_select = isMultiSelect;
+
+                // Get options dynamically
+                questionData.options = getEditOptionsData();
+
+                // Validate minimum options
+                if (questionData.options.length < MIN_OPTIONS) {
+                    alert(`Please add at least ${MIN_OPTIONS} options`);
+                    return;
+                }
+
+                // Check for empty options
+                const emptyOptions = questionData.options.filter(opt => !opt.trim());
+                if (emptyOptions.length > 0) {
+                    alert('Please fill in all option fields');
+                    return;
+                }
+
+                // Get correct answers dynamically
+                const correctAnswers = getEditCorrectAnswers();
+
+                if (isMultiSelect) {
+                    if (correctAnswers.length < 2) {
+                        alert('Please select at least 2 correct answers for multi-select MCQ');
+                        return;
+                    }
+                    questionData.correct_answers = correctAnswers;
+                    questionData.correct_answer = correctAnswers[0]; // Keep for backward compatibility
+                } else {
+                    if (correctAnswers.length === 0) {
+                        alert('Please select the correct answer');
+                        return;
+                    }
+                    questionData.correct_answer = correctAnswers[0];
+                    questionData.correct_answers = null;
+                }
+            } else {
+                questionData.expected_answer = document.getElementById('editExpectedAnswer').value;
+                questionData.evaluation_criteria = document.getElementById('editEvaluationCriteria').value;
+            }
+
+            try {
+                const response = await fetch(`/api/update-question/${questionId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(questionData)
+                });
+                
+                if (response.ok) {
+                    alert('✅ Question updated successfully!');
+                    location.reload();
+                } else {
+                    throw new Error('Failed to update question');
+                }
+            } catch (error) {
+                alert('❌ Error updating question: ' + error.message);
+            }
+        });
+        
+        // Handle add form submission
+        document.getElementById('addQuestionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const type = document.getElementById('addQuestionType').value;
+            
+            const questionData = {
+                type: type,
+                section_type: document.getElementById('addQuestionSection').value,
+                question: document.getElementById('addQuestionText').value,
+                marks: parseInt(document.getElementById('addQuestionMarks').value),
+                explanation: document.getElementById('addExplanation').value
+            };
+            
+            if (type === 'mcq') {
+                // Handle multi-select MCQ with dynamic options
+                const isMultiSelect = document.getElementById('addIsMultiSelect').checked;
+                questionData.is_multi_select = isMultiSelect;
+
+                // Get options dynamically
+                questionData.options = getAddOptionsData();
+
+                // Validate minimum options
+                if (questionData.options.length < MIN_OPTIONS) {
+                    alert(`Please add at least ${MIN_OPTIONS} options`);
+                    return;
+                }
+
+                // Check for empty options
+                const emptyOptions = questionData.options.filter(opt => !opt.trim());
+                if (emptyOptions.length > 0) {
+                    alert('Please fill in all option fields');
+                    return;
+                }
+
+                // Get correct answers dynamically
+                const correctAnswers = getAddCorrectAnswers();
+
+                if (isMultiSelect) {
+                    if (correctAnswers.length < 2) {
+                        alert('Please select at least 2 correct answers for multi-select MCQ');
+                        return;
+                    }
+                    questionData.correct_answers = correctAnswers;
+                    questionData.correct_answer = correctAnswers[0]; // Keep for backward compatibility
+                } else {
+                    if (correctAnswers.length === 0) {
+                        alert('Please select the correct answer');
+                        return;
+                    }
+                    questionData.correct_answer = correctAnswers[0];
+                    questionData.correct_answers = null;
+                }
+            } else {
+                questionData.expected_answer = document.getElementById('addExpectedAnswer').value;
+                questionData.evaluation_criteria = document.getElementById('addEvaluationCriteria').value;
+            }
+
+            try {
+                const response = await fetch(`/api/add-question/${examId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(questionData)
+                });
+                
+                if (response.ok) {
+                    alert('✅ Question added successfully!');
+                    location.reload();
+                } else {
+                    throw new Error('Failed to add question');
+                }
+            } catch (error) {
+                alert('❌ Error adding question: ' + error.message);
+            }
+        });
+        
+        async function deleteQuestion(questionId) {
+            if (confirm('Are you sure you want to delete this question? This action cannot be undone.')) {
+                try {
+                    const response = await fetch(`/api/delete-question/${questionId}`, {
+                        method: 'DELETE',
+                        credentials: 'include'
+                    });
+                    
+                    if (response.ok) {
+                        alert('✅ Question deleted successfully!');
+                        // Remove the question card from the DOM
+                        const questionCards = document.querySelectorAll(`[data-question-id="${questionId}"]`);
+                        questionCards.forEach(card => {
+                            card.style.transition = 'opacity 0.3s ease';
+                            card.style.opacity = '0';
+                            setTimeout(() => card.remove(), 300);
+                        });
+                    } else {
+                        throw new Error('Failed to delete question');
+                    }
+                } catch (error) {
+                    alert('❌ Error deleting question: ' + error.message);
+                }
+            }
+        }
+
+        async function copyToClipboardSecure(text) {
+            try {
+                // Try modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                } else {
+                    throw new Error('Clipboard API not available');
+                }
+            } catch (err) {
+                console.log('Clipboard API failed, using fallback:', err);
+                return copyToClipboardFallback(text);
+            }
+        }
+
+        function copyToClipboardFallback(text) {
+            try {
+                // Create a temporary textarea element
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.left = '-999999px';
+                textarea.style.top = '-999999px';
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                
+                // Try to copy using execCommand
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                if (successful) {
+                    return true;
+                } else {
+                    throw new Error('execCommand failed');
+                }
+            } catch (err) {
+                console.error('Fallback copy failed:',err);
+                return false;
+            }
+        }
+        
+        async function finalizeExam() {
+            if (questions.length === 0) {
+                alert('❌ Cannot finalize exam without questions. Please add at least one question.');
+                return;
+            }
+            
+            if (confirm('🚀 Are you sure you want to finalize this exam?\n\nOnce finalized:\n- The exam will be available to candidates\n- Questions cannot be edited\n- A unique exam link will be generated\n\nProceed?')) {
+                try {
+                    const response = await fetch(`/admin/finalize-exam/${examId}`, {
+                        method: 'POST',
+                        credentials: 'include'
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        const examLink = `${window.location.origin}/exam/${result.exam_link}`;
+                        
+                        // Try to copy to clipboard
+                        const copySuccess = await copyToClipboardSecure(examLink);
+                        
+                        if (copySuccess) {
+                            alert(`🎉 Exam finalized successfully!\n\n📋 Exam Link:\n${examLink}\n\n✅ Link copied to clipboard!\n\n📋 Share this link with candidates to access the exam.`);
+                        } else {
+                            // Show manual copy dialog if clipboard fails
+                            alert(`🎉 Exam finalized successfully!\n\n📋 Exam Link:\n${examLink}\n\nPlease copy this link manually and share with candidates.`);
+                        }
+                        
+                        // Redirect to admin dashboard
+                        window.location.href = '/admin';
+                    } else {
+                        throw new Error('Failed to finalize exam');
+                    }
+                } catch (error) {
+                    alert('❌ Error finalizing exam: ' + error.message);
+                }
+            }
+        }
+        
+        function previewExam() {
+            // Create a preview of how the exam will look to candidates
+            let previewHtml = `
+                <div style="font-family: 'Segoe UI', sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+                    <h1>📋 {{ exam.title }}</h1>
+                    <div style="background: #f8f9ff; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                        <h3>📝 Instructions:</h3>
+                        <p>{{ exam.instructions or 'No instructions provided' }}</p>
+                        <p><strong>⏰ Time Limit:</strong> {{ exam.time_limit }} minutes</p>
+                        <p><strong>📊 Total Questions:</strong> ${questions.length}</p>
+                    </div>
+            `;
+            
+            questions.forEach((question, index) => {
+                previewHtml += `
+                    <div style="border: 2px solid #e1e5e9; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <h3>Question ${index + 1} (${question.marks} marks) - ${question.section_type ? question.section_type.replace('_', ' ').toUpperCase() : 'GENERAL'}</h3>
+                        <p style="font-size: 1.1rem; margin: 15px 0;">${question.question}</p>
+                `;
+                
+                // Add images to preview
+                if (question.image_url || (question.images && question.images.length > 0)) {
+                    previewHtml += '<div style="margin: 15px 0;">';
+                    if (question.image_url) {
+                        previewHtml += `<img src="${question.image_url}" style="max-width: 400px; max-height: 300px; border: 1px solid #ddd; border-radius: 5px; margin: 10px;">`;
+                    }
+                    if (question.images) {
+                        question.images.forEach(img => {
+                            previewHtml += `<img src="${img.url}" style="max-width: 400px; max-height: 300px; border: 1px solid #ddd; border-radius: 5px; margin: 10px;">`;
+                        });
+                    }
+                    previewHtml += '</div>';
+                }
+                
+                if (question.type === 'mcq') {
+                    question.options.forEach((option, optIndex) => {
+                        previewHtml += `
+                            <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                <input type="radio" name="q${index}" value="${optIndex}" disabled>
+                                <label style="margin-left: 10px;">${['A', 'B', 'C', 'D'][optIndex]}) ${option}</label>
+                            </div>
+                        `;
+                    });
+                } else {
+                    previewHtml += `
+                        <textarea style="width: 100%; min-height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" disabled placeholder="Answer will be typed here..."></textarea>
+                    `;
+                }
+                
+                previewHtml += '</div>';
+            });
+            
+            previewHtml += '</div>';
+            
+            const previewWindow = window.open('', '_blank', 'width=900,height=700,scrollbars=yes');
+            previewWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Exam Preview - {{ exam.title }}</title>
+                        <style>
+                            body { background: #f5f7fa; margin: 0; padding: 20px; }
+                            h1 { color: #333; text-align: center; }
+                            h3 { color: #667eea; }
+                        </style>
+                    </head>
+                    <body>
+                        ${previewHtml}
+                        <div style="text-align: center; margin-top: 30px;">
+                            <button onclick="window.close()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">Close Preview</button>
+                        </div>
+                    </body>
+                </html>
+            `);
+        }
+        
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const editModal = document.getElementById('editModal');
+            const addModal = document.getElementById('addModal');
+            const regenerateModal = document.getElementById('regenerateModal');
+
+            if (event.target === editModal) {
+                editModal.style.display = 'none';
+            }
+            if (event.target === addModal) {
+                addModal.style.display = 'none';
+            }
+            if (event.target === regenerateModal) {
+                closeRegenerateModal();
+            }
+        }
+
+        // ============================================
+        // REGENERATE SECTION FUNCTIONALITY
+        // ============================================
+
+        const sectionsStructure = {{ sections_structure | tojson | safe }};
+        let currentRegenerateSection = null;
+
+        async function openRegenerateModal(sectionType) {
+            currentRegenerateSection = sectionType;
+
+            // Fetch section info from API
+            try {
+                const response = await fetch(`/api/section-info/${examId}/${sectionType}`, {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    populateRegenerateModal(data);
+                } else {
+                    // Fallback to local data
+                    const sectionConfig = sectionsStructure[sectionType] || {};
+                    populateRegenerateModal({
+                        section_type: sectionType,
+                        display_name: sectionConfig.display_name || sectionType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                        syllabus: sectionConfig.syllabus || '',
+                        mcq_count: sectionConfig.mcq_count || 0,
+                        short_count: sectionConfig.short_count || 0,
+                        essay_count: sectionConfig.essay_count || 0,
+                        mcq_marks: sectionConfig.mcq_marks || 1,
+                        short_marks: sectionConfig.short_marks || 5,
+                        essay_marks: sectionConfig.essay_marks || 10,
+                        generation_status: sectionConfig.generation_status || 'unknown',
+                        current_question_count: sections[sectionType] ? sections[sectionType].length : 0
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching section info:', error);
+                alert('❌ Error loading section information');
+                return;
+            }
+
+            document.getElementById('regenerateModal').style.display = 'block';
+        }
+
+        function populateRegenerateModal(data) {
+            document.getElementById('regenerateSectionName').textContent = data.display_name || data.section_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            document.getElementById('regenerateSyllabus').value = data.syllabus || '';
+
+            // Populate section info
+            const infoHtml = `
+                <div class="section-info-item">
+                    <span>MCQ Questions:</span>
+                    <span>${data.mcq_count} × ${data.mcq_marks} marks</span>
+                </div>
+                <div class="section-info-item">
+                    <span>Short Answer:</span>
+                    <span>${data.short_count} × ${data.short_marks} marks</span>
+                </div>
+                <div class="section-info-item">
+                    <span>Essay Questions:</span>
+                    <span>${data.essay_count} × ${data.essay_marks} marks</span>
+                </div>
+                <div class="section-info-item">
+                    <span>Current Questions:</span>
+                    <span>${data.current_question_count} questions</span>
+                </div>
+                <div class="section-info-item">
+                    <span>Generation Status:</span>
+                    <span class="section-status status-${data.generation_status}">${data.generation_status}</span>
+                </div>
+            `;
+            document.getElementById('regenerateSectionInfo').innerHTML = infoHtml;
+        }
+
+        function closeRegenerateModal() {
+            document.getElementById('regenerateModal').style.display = 'none';
+            currentRegenerateSection = null;
+        }
+
+        async function confirmRegenerate() {
+            if (!currentRegenerateSection) {
+                alert('❌ No section selected');
+                return;
+            }
+
+            const syllabus = document.getElementById('regenerateSyllabus').value.trim();
+            const customInstructions = document.getElementById('regenerateInstructions').value.trim();
+            const difficultyLevel = document.getElementById('regenerateDifficulty').value;
+
+            // Confirm action
+            const sectionName = document.getElementById('regenerateSectionName').textContent;
+            if (!confirm(`⚠️ This will DELETE all existing questions in the "${sectionName}" section and generate new ones using AI.\n\nAre you sure you want to continue?`)) {
+                return;
+            }
+
+            // Show loading state
+            const btn = document.getElementById('confirmRegenerateBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span> Generating...';
+            btn.classList.add('loading');
+
+            try {
+                const response = await fetch(`/api/regenerate-section/${examId}/${currentRegenerateSection}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        syllabus: syllabus,
+                        custom_instructions: customInstructions,
+                        difficulty_level: difficultyLevel
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    alert(`✅ ${result.message}\n\nThe page will now reload to show the new questions.`);
+                    window.location.reload();
+                } else {
+                    throw new Error(result.error || result.message || 'Failed to regenerate section');
+                }
+
+            } catch (error) {
+                console.error('Error regenerating section:', error);
+                alert(`❌ Error regenerating section: ${error.message}\n\nYou can try again or edit questions manually.`);
+
+                // Reset button
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                btn.classList.remove('loading');
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Edit exam page loaded with', questions.length, 'questions');
+            console.log('Manual mode:', manualMode);
+            console.log('Sections:', sections);
+            console.log('Sections Structure:', sectionsStructure);
+
+            // Show manual mode instructions if applicable
+            if (manualMode) {
+                console.log('📝 Page loaded in manual question creation mode');
+            }
+
+            // Check for failed sections in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const failedSections = urlParams.get('failed');
+            if (failedSections) {
+                console.log('⚠️ Failed sections:', failedSections);
+            }
+        });
+    </script>
+
+    <!-- Regenerate Section Modal -->
+    <div id="regenerateModal" class="regenerate-modal">
+        <div class="regenerate-modal-content">
+            <div class="regenerate-modal-header">
+                <h2>🔄 Regenerate Section: <span id="regenerateSectionName"></span></h2>
+                <button class="regenerate-modal-close" onclick="closeRegenerateModal()">&times;</button>
+            </div>
+            <div class="regenerate-modal-body">
+                <div class="section-info-box">
+                    <h4>📊 Section Configuration</h4>
+                    <div id="regenerateSectionInfo">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="regenerate-warning">
+                    ⚠️ <strong>Warning:</strong> This will delete all existing questions in this section and generate new ones using AI. This action cannot be undone.
+                </div>
+
+                <div class="regenerate-form-group">
+                    <label for="regenerateSyllabus">
+                        📚 Syllabus / Topics
+                        <small>(Update the topics you want questions on)</small>
+                    </label>
+                    <textarea id="regenerateSyllabus" placeholder="Enter the syllabus or topics for this section...
+
+Example:
+- Data Structures (Arrays, Linked Lists, Trees)
+- Algorithms (Sorting, Searching)
+- Database concepts (SQL, Normalization)"></textarea>
+                </div>
+
+                <div class="regenerate-form-group">
+                    <label for="regenerateInstructions">
+                        📝 Custom Instructions
+                        <small>(Optional - Any specific requirements for the AI)</small>
+                    </label>
+                    <textarea id="regenerateInstructions" placeholder="Example: Focus on practical scenarios, include code snippets, make questions relevant to web development..."></textarea>
+                </div>
+
+                <div class="regenerate-form-group">
+                    <label for="regenerateDifficulty">🎯 Difficulty Level</label>
+                    <select id="regenerateDifficulty">
+                        <option value="easy">Easy - Basic knowledge and fundamentals</option>
+                        <option value="medium" selected>Medium - Intermediate application</option>
+                        <option value="hard">Hard - Advanced concepts and analysis</option>
+                        <option value="mixed">Mixed - Progressive difficulty</option>
+                    </select>
+                </div>
+            </div>
+            <div class="regenerate-modal-footer">
+                <button class="btn-cancel" onclick="closeRegenerateModal()">Cancel</button>
+                <button id="confirmRegenerateBtn" class="btn-confirm-regenerate" onclick="confirmRegenerate()">
+                    🔄 Regenerate Questions
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Options Modal -->
+    <div id="printOptionsModal" class="print-options-modal">
+        <div class="print-options-content">
+            <div class="print-options-header">
+                <h2>🖨️ Print / Download Questions</h2>
+                <button class="print-options-close" onclick="closePrintOptions()">&times;</button>
+            </div>
+            <div class="print-options-body">
+                <p style="margin-bottom: 20px; color: #666;">
+                    Generate a print-friendly version of the exam questions. You can print directly or save as PDF using your browser's print dialog.
+                </p>
+
+                <div class="print-buttons-group">
+                    <button class="btn-print-action btn-print-questions" onclick="printQuestions(false)">
+                        📄 Questions Only
+                    </button>
+                    <button class="btn-print-action btn-print-with-answers" onclick="printQuestions(true)">
+                        📝 With Answers
+                    </button>
+                </div>
+
+                <div class="print-info-note">
+                    <strong>💡 Tip:</strong> To save as PDF, click one of the buttons above, then in the print dialog select "Save as PDF" as the destination.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Print Options Functions
+        function openPrintOptions() {
+            document.getElementById('printOptionsModal').style.display = 'block';
+        }
+
+        function closePrintOptions() {
+            document.getElementById('printOptionsModal').style.display = 'none';
+        }
+
+        function printQuestions(includeAnswers) {
+            const url = `/admin/download-exam-questions/${examId}${includeAnswers ? '?answers=true' : ''}`;
+            window.open(url, '_blank');
+            closePrintOptions();
+        }
+
+        // Close print modal when clicking outside
+        document.getElementById('printOptionsModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closePrintOptions();
+            }
+        });
+    </script>
+</body>
+</html>

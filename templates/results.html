@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz Results</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f9f9ff;
+            padding: 30px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .summary {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .result-block {
+            padding: 15px;
+            border-left: 5px solid #ccc;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+        .correct {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+        .incorrect {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+        .manual {
+            border-color: #facc15;
+            background: #fefce8;
+        }
+        .label {
+            font-weight: bold;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: #667eea;
+            color: white;
+            text-align: center;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🎯 Quiz Results</h1>
+    <div class="summary">
+        <p><strong>Name:</strong> {{ name }}</p>
+        <p><strong>ID:</strong> {{ user_id }}</p>
+        <p><strong>Department:</strong> {{ department }}</p>
+        <p><strong>Score:</strong> {{ score }}/{{ total_questions }} ({{ percentage|round(1) }}%)</p>
+        <p><strong>Time Taken:</strong> {{ time_taken }}</p>
+        <p><strong>Feedback:</strong> {{ performance_msg }}</p>
+    </div>
+    <h2>📝 Detailed Results</h2>
+    {% for result in results %}
+        <div class="result-block {% if result.type == 'written' %}manual{% elif result.is_correct %}correct{% else %}incorrect{% endif %}">
+            <p><strong>Q{{ result.question_id }}:</strong> {{ result.question }}</p>
+            {% if result.type == 'mcq' %}
+                <p><span class="label">Your Answer:</span> {{ result.user_option }}</p>
+                <p><span class="label">Correct Answer:</span> {{ result.correct_option }}</p>
+                {% if result.explanation %}<p><em>Explanation:</em> {{ result.explanation }}</p>{% endif %}
+            {% elif result.type == 'short' %}
+                <p><span class="label">Your Answer:</span> {{ result.user_response }}</p>
+                <p><span class="label">Matched Keywords:</span> {{ result.matched_keywords | join(', ') }}</p>
+            {% elif result.type == 'written' %}
+                <p><span class="label">Your Response:</span> {{ result.user_response }}</p>
+                <p><em>Manual Evaluation Required</em></p>
+            {% endif %}
+        </div>
+    {% endfor %}
+    <a href="/" class="btn">🏠 Back to Home</a>
+</div>
+</body>
+</html>

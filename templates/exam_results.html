@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Results - {{ exam.title }}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid white;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .nav-link:hover {
+            background: white;
+            color: #667eea;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .exam-info {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .exam-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 8px;
+        }
+        
+        .detail-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .detail-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stats-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9ff 0%, #e0f2fe 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e1e5e9;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .results-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: #f8f9ff;
+            padding: 20px 25px;
+            border-bottom: 2px solid #e1e5e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Enhanced Sorting Controls */
+        .sort-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 2px solid #e1e5e9;
+        }
+
+        .sort-label {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .sort-select {
+            padding: 6px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            background: white;
+        }
+
+        .sort-direction {
+            display: flex;
+            background: #f3f4f6;
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .sort-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            color: #6b7280;
+        }
+
+        .sort-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .sort-btn:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .sort-btn.active:hover {
+            background: #5a67d8;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .results-table th,
+        .results-table td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .results-table th {
+            background: #f8f9ff;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .results-table th:hover {
+            background: #f0f4ff;
+        }
+
+        .results-table th.sortable::after {
+            content: '↕️';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        .results-table th.sort-asc::after {
+            content: '↑';
+            opacity: 1;
+            color: #667eea;
+        }
+
+        .results-table th.sort-desc::after {
+            content: '↓';
+            opacity: 1;
+            color: #667eea;
+        }
+        
+        .results-table td {
+            color: #555;
+        }
+        
+        .results-table tr:hover {
+            background: #f8f9ff;
+        }
+        
+        .performance-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .performance-excellent {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .performance-good {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .performance-average {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .performance-poor {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .score-bar {
+            width: 100px;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .score-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .score-fill.excellent {
+            background: #10b981;
+        }
+        
+        .score-fill.good {
+            background: #3b82f6;
+        }
+        
+        .score-fill.average {
+            background: #f59e0b;
+        }
+        
+        .score-fill.poor {
+            background: #ef4444;
+        }
+        
+        /* Score Display with Negative Marks */
+        .score-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .main-score {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .negative-marks {
+            color: #dc2626;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .final-score {
+            color: #059669;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-view {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-download {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-edit {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .export-section {
+            background: #f0f9ff;
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .export-section h3 {
+            color: #1e40af;
+            margin-bottom: 15px;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Edit Modal Styles */
+        .edit-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .edit-modal-content {
+            background: white;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+
+        .edit-modal-header {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px 15px 0 0;
+            position: relative;
+        }
+
+        .edit-modal-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #f59e0b;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+        
+        /* Modal Summary Cards with Negative Marks */
+        .modal-summary-card {
+            text-align: center;
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e1e5e9;
+        }
+        
+        .modal-summary-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .modal-summary-negative {
+            color: #dc2626;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .modal-summary-final {
+            color: #059669;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+        
+        .modal-summary-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Question Card Negative Marks Display */
+        .question-negative-marks {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        
+        .question-negative-marks .negative-text {
+            color: #dc2626;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Sort Indicator */
+        .sort-indicator {
+            background: #e0f2fe;
+            border: 1px solid #0284c7;
+            color: #0c4a6e;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .exam-details,
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .filters {
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+
+            .sort-controls {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+
+            .sort-direction {
+                justify-content: center;
+            }
+            
+            .results-table {
+                font-size: 0.85rem;
+            }
+            
+            .results-table th,
+            .results-table td {
+                padding: 10px 8px;
+            }
+            
+            .export-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .score-breakdown {
+                font-size: 0.9rem;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>📊 Exam Results Dashboard</h1>
+            <a href="/admin" class="nav-link">← Back to Admin Dashboard</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Exam Information -->
+        <div class="exam-info">
+            <h2 style="color: #333; margin-bottom: 20px;">📋 {{ exam.title }}</h2>
+            <div class="exam-details">
+                <div class="detail-item">
+                    <div class="detail-value">{{ exam.department }}</div>
+                    <div class="detail-label">Department</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-value">{{ exam.position }}</div>
+                    <div class="detail-label">Position</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-value">{{ exam.time_limit or 'N/A' }} min</div>
+                    <div class="detail-label">Time Limit</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-value">{{ results|length }}</div>
+                    <div class="detail-label">Submissions</div>
+                </div>
+            </div>
+            <p style="color: #666; line-height: 1.6;"><strong>Description:</strong> {{ exam.description or 'No description provided' }}</p>
+        </div>
+        
+        <!-- Statistics -->
+        {% if results %}
+        <div class="stats-section">
+            <h3 style="color: #333; margin-bottom: 20px; text-align: center;">📈 Performance Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">{{ results|length }}</div>
+                    <div class="stat-label">Total Candidates</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ "%.1f"|format(results|map(attribute='percentage')|sum / results|length) }}%</div>
+                    <div class="stat-label">Average Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ results|selectattr('performance_level', 'equalto', 'Excellent')|list|length }}</div>
+                    <div class="stat-label">Excellent</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ results|selectattr('performance_level', 'equalto', 'Good')|list|length }}</div>
+                    <div class="stat-label">Good</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ results|selectattr('performance_level', 'equalto', 'Average')|list|length }}</div>
+                    <div class="stat-label">Average</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ results|selectattr('performance_level', 'equalto', 'Poor')|list|length }}</div>
+                    <div class="stat-label">Poor</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Export Section -->
+        <div class="export-section">
+            <h3>📥 Export Results</h3>
+            <div class="export-buttons">
+                <button class="btn btn-success" onclick="exportToCSV()">📊 Export to CSV</button>
+                <button class="btn btn-primary" onclick="exportToExcel()">📈 Export to Excel</button>
+                <button class="btn btn-secondary" onclick="generateReport()">📄 Generate Report</button>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Results Table -->
+        <div class="results-section">
+            <div class="section-header">
+                <h2 class="section-title">📋 Candidate Results</h2>
+                <div class="filters">
+                    <!-- Enhanced Sorting Controls -->
+                    <div class="sort-controls">
+                        <span class="sort-label">🔀 Sort by:</span>
+                        <select class="sort-select" id="sortField" onchange="applySorting()">
+                            <option value="name">Candidate Name</option>
+                            <option value="marks" selected>Obtained Marks</option>
+                            <option value="percentage">Percentage</option>
+                            <option value="performance">Performance Level</option>
+                            <option value="time">Submission Time</option>
+                            <option value="duration">Time Taken</option>
+                        </select>
+                        <div class="sort-direction">
+                            <button class="sort-btn active" id="sortAsc" onclick="setSortDirection('asc')">
+                                ↑ Asc
+                            </button>
+                            <button class="sort-btn" id="sortDesc" onclick="setSortDirection('desc')">
+                                ↓ Desc
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <select class="filter-select" id="performanceFilter" onchange="filterResults()">
+                        <option value="">All Performance</option>
+                        <option value="Excellent">Excellent</option>
+                        <option value="Good">Good</option>
+                        <option value="Average">Average</option>
+                        <option value="Poor">Poor</option>
+                    </select>
+                    <input type="text" class="filter-select" id="searchFilter" placeholder="Search candidate..." onkeyup="filterResults()">
+                </div>
+            </div>
+            
+            {% if results %}
+            <div class="table-container">
+                <table class="results-table" id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th class="sortable" data-sort="name" onclick="sortTableByColumn('name')">
+                                Candidate
+                            </th>
+                            <th class="sortable sort-desc" data-sort="marks" onclick="sortTableByColumn('marks')">
+                                Score Details
+                            </th>
+                            <th class="sortable" data-sort="percentage" onclick="sortTableByColumn('percentage')">
+                                Percentage
+                            </th>
+                            <th class="sortable" data-sort="performance" onclick="sortTableByColumn('performance')">
+                                Performance
+                            </th>
+                            <th class="sortable" data-sort="duration" onclick="sortTableByColumn('duration')">
+                                Time Taken
+                            </th>
+                            <th class="sortable" data-sort="time" onclick="sortTableByColumn('time')">
+                                Submitted
+                            </th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for result in results %}
+                        <tr data-performance="{{ result.performance_level }}" 
+                            data-candidate="{{ result.candidate_name.lower() }} {{ result.candidate_id.lower() }}"
+                            data-result-id="{{ result.id }}"
+                            data-marks="{{ result.obtained_marks }}"
+                            data-percentage="{{ result.percentage }}"
+                            data-performance-level="{{ result.performance_level }}"
+                            data-submitted-time="{{ result.submitted_at }}"
+                            data-duration="{{ result.time_taken or '00:00' }}">
+                            <td>
+                                <div>
+                                    <strong>{{ result.candidate_name }}</strong><br>
+                                    <small style="color: #666;">ID: {{ result.candidate_id }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="score-breakdown">
+                                    <div class="main-score">{{ "%.2f"|format(result.obtained_marks) }}/{{ result.total_marks }}</div>
+                                    {% if result.negative_marks and result.negative_marks > 0 %}
+                                    <div class="negative-marks">-{{ "%.2f"|format(result.negative_marks) }} negative</div>
+                                    {% endif %}
+                                </div>
+                                <div class="score-bar" style="margin-top: 8px;">
+                                    <div class="score-fill {{ result.performance_level.lower() }}" 
+                                         style="width: {{ result.percentage }}%"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <strong style="font-size: 1.1rem;" class="percentage-display">{{ "%.1f"|format(result.percentage) }}%</strong>
+                            </td>
+                            <td>
+                                <span class="performance-badge performance-{{ result.performance_level.lower() }} performance-display">
+                                    {{ result.performance_level }}
+                                </span>
+                            </td>
+                            <td>{{ result.time_taken or 'N/A' }}</td>
+                            <td>{{ result.submitted_at.split(' ')[0] if result.submitted_at else 'N/A' }}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn btn-view" onclick="viewResult('{{ result.id }}')">
+                                        👁️ View
+                                    </button>
+                                    <button class="action-btn btn-download" onclick="downloadResult('{{ result.id }}')">
+                                        📥 Download
+                                    </button>
+                                    <button class="action-btn btn-edit" onclick="editResult('{{ result.id }}')">
+                                        ✏️ Edit
+                                    </button>
+                                    <button class="action-btn btn-delete" onclick="deleteResult('{{ result.id }}', '{{ result.candidate_name }}')">
+                                        🗑️ Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="no-results">
+                <h3>📭 No Results Yet</h3>
+                <p>No candidates have taken this exam yet.</p>
+                <br>
+                <a href="/admin" class="btn btn-secondary">← Back to Dashboard</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        console.log('🚀 JavaScript loaded successfully');
+
+        // Global sorting state
+        let currentSortField = 'marks';
+        let currentSortDirection = 'desc';
+        
+        // Enhanced sorting functionality
+        function applySorting() {
+            const sortField = document.getElementById('sortField').value;
+            currentSortField = sortField;
+            sortTableData();
+            updateSortIndicators();
+        }
+
+        function setSortDirection(direction) {
+            currentSortDirection = direction;
+            
+            // Update button states
+            document.getElementById('sortAsc').classList.toggle('active', direction === 'asc');
+            document.getElementById('sortDesc').classList.toggle('active', direction === 'desc');
+            
+            sortTableData();
+            updateSortIndicators();
+        }
+
+        function sortTableByColumn(field) {
+            if (currentSortField === field) {
+                // Toggle direction if same field
+                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                // New field, default to desc for marks/percentage, asc for others
+                currentSortField = field;
+                currentSortDirection = ['marks', 'percentage'].includes(field) ? 'desc' : 'asc';
+            }
+
+            // Update controls
+            document.getElementById('sortField').value = field;
+            setSortDirection(currentSortDirection);
+        }
+
+        function sortTableData() {
+            const table = document.getElementById('resultsTable');
+            const tbody = table.getElementsByTagName('tbody')[0];
+            const rows = Array.from(tbody.getElementsByTagName('tr'));
+
+            rows.sort((a, b) => {
+                let aValue, bValue;
+
+                switch (currentSortField) {
+                    case 'name':
+                        aValue = a.querySelector('strong').textContent.toLowerCase();
+                        bValue = b.querySelector('strong').textContent.toLowerCase();
+                        break;
+                    case 'marks':
+                        aValue = parseFloat(a.getAttribute('data-marks')) || 0;
+                        bValue = parseFloat(b.getAttribute('data-marks')) || 0;
+                        break;
+                    case 'percentage':
+                        aValue = parseFloat(a.getAttribute('data-percentage')) || 0;
+                        bValue = parseFloat(b.getAttribute('data-percentage')) || 0;
+                        break;
+                    case 'performance':
+                        const performanceOrder = { 'Excellent': 4, 'Good': 3, 'Average': 2, 'Poor': 1 };
+                        aValue = performanceOrder[a.getAttribute('data-performance-level')] || 0;
+                        bValue = performanceOrder[b.getAttribute('data-performance-level')] || 0;
+                        break;
+                    case 'time':
+                        aValue = new Date(a.getAttribute('data-submitted-time') || '1970-01-01').getTime();
+                        bValue = new Date(b.getAttribute('data-submitted-time') || '1970-01-01').getTime();
+                        break;
+                    case 'duration':
+                        aValue = timeToMinutes(a.getAttribute('data-duration') || '00:00');
+                        bValue = timeToMinutes(b.getAttribute('data-duration') || '00:00');
+                        break;
+                    default:
+                        return 0;
+                }
+
+                if (aValue < bValue) return currentSortDirection === 'asc' ? -1 : 1;
+                if (aValue > bValue) return currentSortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            // Re-append sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        function timeToMinutes(timeStr) {
+            if (!timeStr || timeStr === 'N/A') return 0;
+            const parts = timeStr.split(':');
+            return parseInt(parts[0]) * 60 + parseInt(parts[1] || 0);
+        }
+
+        function updateSortIndicators() {
+            // Clear all sort indicators
+            document.querySelectorAll('.results-table th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+            });
+
+            // Add indicator to current sort field
+            const currentHeader = document.querySelector(`[data-sort="${currentSortField}"]`);
+            if (currentHeader) {
+                currentHeader.classList.add(currentSortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+            }
+        }
+        
+        function filterResults() {
+            const performanceFilter = document.getElementById('performanceFilter').value.toLowerCase();
+            const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+            
+            const table = document.getElementById('resultsTable');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const performance = row.getAttribute('data-performance').toLowerCase();
+                const candidate = row.getAttribute('data-candidate');
+                
+                let showRow = true;
+                
+                // Filter by performance
+                if (performanceFilter && !performance.includes(performanceFilter)) {
+                    showRow = false;
+                }
+                
+                // Filter by candidate search
+                if (searchFilter && !candidate.includes(searchFilter)) {
+                    showRow = false;
+                }
+                
+                row.style.display = showRow ? '' : 'none';
+            }
+        }
+        
+        function viewResult(resultId) {
+            console.log('👁️ View button clicked for result:', resultId);
+            
+            fetch('/api/result-details/' + resultId, {
+                method: 'GET',
+                credentials: 'include'
+            })
+            .then(function(response) {
+                console.log('📡 Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                console.log('📊 Data received:', data);
+                showExamModal(data);
+            })
+            .catch(function(error) {
+                console.error('❌ Error:', error);
+                alert('Error loading exam details: ' + error.message);
+            });
+        }
+        
+        function downloadResult(resultId) {
+            console.log('📥 Download button clicked for result:', resultId);
+            
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admin/download-result';
+            form.target = '_blank';
+            
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'result_id';
+            input.value = resultId;
+            form.appendChild(input);
+            
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+        }
+        
+        function deleteResult(resultId, candidateName) {
+            console.log('🗑️ Delete button clicked for result:', resultId);
+            
+            // Show confirmation dialog
+            const confirmMessage = `⚠️ Are you sure you want to delete the exam result for "${candidateName}"?\n\n` +
+                                 `This action will permanently remove:\n` +
+                                 `• All answers and scores\n` +
+                                 `• Evaluation details and feedback\n` +
+                                 `• Complete submission record\n\n` +
+                                 `This action CANNOT be undone!\n\n` +
+                                 `Type "DELETE" to confirm:`;
+            
+            const userInput = prompt(confirmMessage);
+            
+            if (userInput === "DELETE") {
+                // Show loading state
+                const deleteBtn = document.querySelector(`button[onclick*="${resultId}"][onclick*="deleteResult"]`);
+                const originalText = deleteBtn.innerHTML;
+                deleteBtn.innerHTML = '🔄 Deleting...';
+                deleteBtn.disabled = true;
+                
+                fetch('/api/delete-result/' + resultId, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                })
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('HTTP ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(function(data) {
+                    if (data.success) {
+                        alert('✅ Result deleted successfully!');
+                        location.reload(); // Refresh the page to update the list
+                    } else {
+                        throw new Error(data.error || 'Failed to delete result');
+                    }
+                })
+                .catch(function(error) {
+                    console.error('❌ Error deleting result:', error);
+                    alert('❌ Error deleting result: ' + error.message);
+                    
+                    // Restore button state
+                    deleteBtn.innerHTML = originalText;
+                    deleteBtn.disabled = false;
+                });
+            } else if (userInput !== null) {
+                alert('❌ Deletion cancelled. You must type "DELETE" to confirm.');
+            }
+        }
+        
+        function editResult(resultId) {
+            console.log('✏️ Edit button clicked for result:', resultId);
+            
+            // Fetch result details first
+            fetch('/api/result-details/' + resultId, {
+                method: 'GET',
+                credentials: 'include'
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                showEditModal(data);
+            })
+            .catch(function(error) {
+                console.error('❌ Error:', error);
+                alert('Error loading result for editing: ' + error.message);
+            });
+        }
+
+        function showEditModal(data) {
+            // Remove existing modal
+            var existing = document.getElementById('editModal');
+            if (existing) {
+                existing.remove();
+            }
+
+            var modal = document.createElement('div');
+            modal.id = 'editModal';
+            modal.className = 'edit-modal';
+            
+            modal.innerHTML = `
+                <div class="edit-modal-content">
+                    <div class="edit-modal-header">
+                        <h2>✏️ Edit Result</h2>
+                        <h3>${data.candidate_name} (${data.candidate_id})</h3>
+                        <button onclick="closeEditModal()" style="
+                            position: absolute;
+                            top: 20px;
+                            right: 25px;
+                            background: rgba(255,255,255,0.2);
+                            border: none;
+                            color: white;
+                            padding: 10px 15px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-size: 16px;
+                            font-weight: bold;
+                        ">×</button>
+                    </div>
+                    
+                    <div class="edit-modal-body">
+                        <div class="form-group">
+                            <label class="form-label">Candidate Name</label>
+                            <input type="text" class="form-input" id="edit_candidate_name" value="${data.candidate_name}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Candidate ID</label>
+                            <input type="text" class="form-input" id="edit_candidate_id" value="${data.candidate_id}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Time Taken</label>
+                            <input type="text" class="form-input" id="edit_time_taken" value="${data.time_taken || ''}">
+                        </div>
+                        
+                        <h4 style="margin: 20px 0 15px 0; color: #333;">Question-wise Marks</h4>
+                        <div id="questionsEdit">
+                            ${createEditQuestionsHTML(data.questions)}
+                        </div>
+                        
+                        <div class="form-buttons">
+                            <button onclick="closeEditModal()" class="btn btn-secondary">Cancel</button>
+                            <button onclick="saveEditedResult('${data.result_id}')" class="btn btn-primary">💾 Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        function createEditQuestionsHTML(questions) {
+            var html = '';
+            for (var i = 0; i < questions.length; i++) {
+                var q = questions[i];
+                html += `
+                    <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 15px; background: #f9fafb;">
+                        <div style="font-weight: 600; margin-bottom: 10px;">
+                            Question ${i + 1} (${q.question_type.toUpperCase()}) - Max: ${q.marks_total} marks
+                        </div>
+                        <div style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">
+                            ${q.question_text.length > 100 ? q.question_text.substring(0, 100) + '...' : q.question_text}
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <label style="font-weight: 500;">Marks:</label>
+                            <input type="number" 
+                                   id="edit_marks_${q.question_id}" 
+                                   value="${q.marks_obtained || 0}" 
+                                   min="0" 
+                                   max="${q.marks_total}"
+                                   step="0.5"
+                                   style="width: 80px; padding: 5px; border: 1px solid #d1d5db; border-radius: 4px;">
+                            <span style="color: #6b7280;">/ ${q.marks_total}</span>
+                            ${q.negative_marks_applied && q.negative_marks_applied > 0 ? 
+                                `<span style="color: #dc2626; font-weight: 600;">(-${q.negative_marks_applied} negative)</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            return html;
+        }
+
+        function closeEditModal() {
+            var modal = document.getElementById('editModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function saveEditedResult(resultId) {
+            var candidateName = document.getElementById('edit_candidate_name').value;
+            var candidateId = document.getElementById('edit_candidate_id').value;
+            var timeTaken = document.getElementById('edit_time_taken').value;
+            
+            // Collect all question marks
+            var questionMarks = {};
+            var markInputs = document.querySelectorAll('[id^="edit_marks_"]');
+            markInputs.forEach(function(input) {
+                var questionId = input.id.replace('edit_marks_', '');
+                questionMarks[questionId] = parseFloat(input.value) || 0;
+            });
+
+            // Save basic info first
+            fetch('/api/update-result-info', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    result_id: resultId,
+                    candidate_name: candidateName,
+                    candidate_id: candidateId,
+                    time_taken: timeTaken
+                })
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Failed to update basic info');
+                }
+                return response.json();
+            })
+            .then(function() {
+                // Now update all question marks
+                var promises = [];
+                for (var questionId in questionMarks) {
+                    promises.push(
+                        fetch('/api/update-question-marks', {
+                            method: 'POST',
+                            credentials: 'include',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                question_id: questionId,
+                                result_id: resultId,
+                                new_marks: questionMarks[questionId]
+                            })
+                        })
+                    );
+                }
+                return Promise.all(promises);
+            })
+            .then(function() {
+                alert('✅ Result updated successfully!');
+                closeEditModal();
+                location.reload();
+            })
+            .catch(function(error) {
+                console.error('❌ Error saving result:', error);
+                alert('❌ Error saving result: ' + error.message);
+            });
+        }
+        
+        function exportToCSV() {
+            const table = document.getElementById('resultsTable');
+            const rows = table.querySelectorAll('tr');
+            
+            let csvContent = '';
+            
+            // Add header
+            csvContent += 'Candidate Name,Candidate ID,Score,Negative Marks,Total Marks,Percentage,Performance,Time Taken,Submitted Date\n';
+            
+            // Add data rows
+            {% for result in results %}
+            csvContent += `"{{ result.candidate_name }}","{{ result.candidate_id }}","{{ "%.2f"|format(result.obtained_marks) }}","{{ "%.2f"|format(result.negative_marks or 0) }}","{{ result.total_marks }}","{{ "%.1f"|format(result.percentage) }}","{{ result.performance_level }}","{{ result.time_taken or 'N/A' }}","{{ result.submitted_at.split(' ')[0] if result.submitted_at else 'N/A' }}"\n`;
+            {% endfor %}
+            
+            // Download CSV
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `{{ exam.title.replace(' ', '_') }}_results.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        function exportToExcel() {
+            // Create Excel-compatible HTML table
+            var excelContent = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <meta charset="utf-8">
+                    <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Exam Results</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+                    <style>
+                        table { border-collapse: collapse; width: 100%; }
+                        th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+                        th { background-color: #f2f2f2; font-weight: bold; }
+                        .header { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+                        .info { margin-bottom: 20px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">{{ exam.title }} - Exam Results</div>
+                    <div class="info">
+                        <p><strong>Department:</strong> {{ exam.department }}</p>
+                        <p><strong>Position:</strong> {{ exam.position }}</p>
+                        <p><strong>Total Candidates:</strong> {{ results|length }}</p>
+                        <p><strong>Average Score:</strong> {{ "%.1f"|format(results|map(attribute='percentage')|sum / results|length) if results else 0 }}%</p>
+                        <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Candidate Name</th>
+                                <th>Candidate ID</th>
+                                <th>Score</th>
+                                <th>Negative Marks</th>
+                                <th>Total Marks</th>
+                                <th>Percentage</th>
+                                <th>Performance Level</th>
+                                <th>Time Taken</th>
+                                <th>Submitted Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            {% for result in results %}
+            excelContent += `
+                            <tr>
+                                <td>{{ result.candidate_name }}</td>
+                                <td>{{ result.candidate_id }}</td>
+                                <td>{{ "%.2f"|format(result.obtained_marks) }}</td>
+                                <td>{{ "%.2f"|format(result.negative_marks or 0) }}</td>
+                                <td>{{ result.total_marks }}</td>
+                                <td>{{ "%.1f"|format(result.percentage) }}%</td>
+                                <td>{{ result.performance_level }}</td>
+                                <td>{{ result.time_taken or 'N/A' }}</td>
+                                <td>{{ result.submitted_at.split(' ')[0] if result.submitted_at else 'N/A' }}</td>
+                            </tr>
+            `;
+            {% endfor %}
+            
+            excelContent += `
+                        </tbody>
+                    </table>
+                    
+                    <div style="margin-top: 30px;">
+                        <h3>Performance Summary</h3>
+                        <table style="width: 400px;">
+                            <tr><th>Performance Level</th><th>Count</th><th>Percentage</th></tr>
+                            <tr><td>Excellent</td><td>{{ results|selectattr('performance_level', 'equalto', 'Excellent')|list|length }}</td><td>${({{ results|selectattr('performance_level', 'equalto', 'Excellent')|list|length }} / {{ results|length }} * 100).toFixed(1)}%</td></tr>
+                            <tr><td>Good</td><td>{{ results|selectattr('performance_level', 'equalto', 'Good')|list|length }}</td><td>${({{ results|selectattr('performance_level', 'equalto', 'Good')|list|length }} / {{ results|length }} * 100).toFixed(1)}%</td></tr>
+                            <tr><td>Average</td><td>{{ results|selectattr('performance_level', 'equalto', 'Average')|list|length }}</td><td>${({{ results|selectattr('performance_level', 'equalto', 'Average')|list|length }} / {{ results|length }} * 100).toFixed(1)}%</td></tr>
+                            <tr><td>Poor</td><td>{{ results|selectattr('performance_level', 'equalto', 'Poor')|list|length }}</td><td>${({{ results|selectattr('performance_level', 'equalto', 'Poor')|list|length }} / {{ results|length }} * 100).toFixed(1)}%</td></tr>
+                        </table>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            // Create and download the Excel file
+            const blob = new Blob([excelContent], { 
+                type: 'application/vnd.ms-excel;charset=utf-8;' 
+            });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `{{ exam.title.replace(' ', '_') }}_results.xls`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+        
+        function generateReport() {
+            const examTitle = '{{ exam.title }}';
+            const totalCandidates = {{ results|length }};
+            const avgScore = {{ "%.1f"|format(results|map(attribute='percentage')|sum / results|length) if results else 0 }};
+            
+            let reportContent = `EXAM RESULTS REPORT\n`;
+            reportContent += `=====================\n\n`;
+            reportContent += `Exam: ${examTitle}\n`;
+            reportContent += `Department: {{ exam.department }}\n`;
+            reportContent += `Position: {{ exam.position }}\n`;
+            reportContent += `Time Limit: {{ exam.time_limit or 'N/A' }} minutes\n`;
+            reportContent += `Total Candidates: ${totalCandidates}\n`;
+            reportContent += `Average Score: ${avgScore}%\n\n`;
+            
+            reportContent += `PERFORMANCE BREAKDOWN:\n`;
+            reportContent += `=====================\n`;
+            reportContent += `Excellent: {{ results|selectattr('performance_level', 'equalto', 'Excellent')|list|length }} candidates\n`;
+            reportContent += `Good: {{ results|selectattr('performance_level', 'equalto', 'Good')|list|length }} candidates\n`;
+            reportContent += `Average: {{ results|selectattr('performance_level', 'equalto', 'Average')|list|length }} candidates\n`;
+            reportContent += `Poor: {{ results|selectattr('performance_level', 'equalto', 'Poor')|list|length }} candidates\n\n`;
+            
+            reportContent += `DETAILED RESULTS:\n`;
+            reportContent += `================\n\n`;
+            
+            {% for result in results %}
+            reportContent += `{{ result.candidate_name }} ({{ result.candidate_id }})\n`;
+            reportContent += `Score: {{ "%.2f"|format(result.obtained_marks) }}/{{ result.total_marks }} ({{ "%.1f"|format(result.percentage) }}%)\n`;
+            {% if result.negative_marks and result.negative_marks > 0 %}
+            reportContent += `Negative Marks Deducted: -{{ "%.2f"|format(result.negative_marks) }}\n`;
+            {% endif %}
+            reportContent += `Performance: {{ result.performance_level }}\n`;
+            reportContent += `Time: {{ result.time_taken or 'N/A' }}\n`;
+            reportContent += `Submitted: {{ result.submitted_at.split(' ')[0] if result.submitted_at else 'N/A' }}\n\n`;
+            {% endfor %}
+            
+            // Download report
+            const blob = new Blob([reportContent], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `{{ exam.title.replace(' ', '_') }}_report.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+        
+        function showExamModal(data) {
+            console.log('🎨 Creating modal for:', data.candidate_name);
+            
+            // Remove existing modal
+            var existing = document.getElementById('examModal');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Create questions HTML
+            var questionsHtml = '';
+            if (data.questions && data.questions.length > 0) {
+                for (var i = 0; i < data.questions.length; i++) {
+                    var q = data.questions[i];
+                    questionsHtml += createQuestionHTML(q, i + 1, data.result_id);
+                }
+            } else {
+                questionsHtml = '<p>No questions found.</p>';
+            }
+            
+            // Calculate final score after negative marking
+            var finalScore = data.obtained_marks;
+            
+            // Create modal
+            var modal = document.createElement('div');
+            modal.id = 'examModal';
+            modal.innerHTML = `
+                <div style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.8);
+                    z-index: 10000;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 20px;
+                ">
+                    <div style="
+                        background: white;
+                        border-radius: 15px;
+                        max-width: 900px;
+                        width: 100%;
+                        max-height: 90vh;
+                        overflow-y: auto;
+                        box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+                    ">
+                        <div style="
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: white;
+                            padding: 25px;
+                            border-radius: 15px 15px 0 0;
+                            position: relative;
+                        ">
+                            <h2>📊 Detailed Exam Results</h2>
+                            <h3>${data.candidate_name} (${data.candidate_id})</h3>
+                            <button onclick="closeModal()" style="
+                                position: absolute;
+                                top: 20px;
+                                right: 25px;
+                                background: rgba(255,255,255,0.2);
+                                border: none;
+                                color: white;
+                                padding: 10px 15px;
+                                border-radius: 8px;
+                                cursor: pointer;
+                                font-size: 16px;
+                                font-weight: bold;
+                            ">×</button>
+                        </div>
+                        
+                        <div style="padding: 30px;">
+                            <div style="
+                                display: grid;
+                                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                                gap: 20px;
+                                margin-bottom: 30px;
+                                background: #f8f9ff;
+                                padding: 25px;
+                                border-radius: 12px;
+                            ">
+                                <div class="modal-summary-card">
+                                    <div class="modal-summary-value">${data.obtained_marks}</div>
+                                    <div class="modal-summary-label">Final Score</div>
+                                </div>
+                                ${data.negative_marks && data.negative_marks > 0 ? `
+                                <div class="modal-summary-card">
+                                    <div class="modal-summary-negative">-${data.negative_marks}</div>
+                                    <div class="modal-summary-label">Negative Marks</div>
+                                </div>
+                                ` : ''}
+                                <div class="modal-summary-card">
+                                    <div class="modal-summary-value">${data.total_marks}</div>
+                                    <div class="modal-summary-label">Total Marks</div>
+                                </div>
+                                <div class="modal-summary-card">
+                                    <div class="modal-summary-value">${data.percentage.toFixed(1)}%</div>
+                                    <div class="modal-summary-label">Percentage</div>
+                                </div>
+                                <div class="modal-summary-card">
+                                    <div style="font-size: 1.2rem; font-weight: bold; color: #667eea;">${data.performance_level}</div>
+                                    <div class="modal-summary-label">Performance</div>
+                                </div>
+                            </div>
+                            
+                            <h3 style="margin-bottom: 25px; color: #333;">📝 Question-wise Performance</h3>
+                            
+                            <div>
+                                ${questionsHtml}
+                            </div>
+                            
+                            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                                <button onclick="window.print()" style="
+                                    padding: 12px 25px;
+                                    background: #10b981;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 8px;
+                                    margin: 5px;
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                    font-size: 14px;
+                                ">🖨️ Print Results</button>
+                                <button onclick="downloadResult('${data.result_id}')" style="
+                                    padding: 12px 25px;
+                                    background: #3b82f6;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 8px;
+                                    margin: 5px;
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                    font-size: 14px;
+                                ">📥 Download PDF</button>
+                                <button onclick="closeModal()" style="
+                                    padding: 12px 25px;
+                                    background: #6b7280;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 8px;
+                                    margin: 5px;
+                                    cursor: pointer;
+                                    font-weight: 600;
+                                    font-size: 14px;
+                                ">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            console.log('✅ Modal created and displayed');
+        }
+        
+        function createQuestionHTML(question, questionNumber, resultId) {
+            var isCorrect = question.is_correct || (question.marks_obtained === question.marks_total);
+            var hasNegative = question.negative_marks_applied && question.negative_marks_applied > 0;
+            var bgColor = isCorrect ? '#f0fdf4' : (question.marks_obtained > 0 ? '#fef3c7' : '#fef2f2');
+            var borderColor = isCorrect ? '#10b981' : (question.marks_obtained > 0 ? '#f59e0b' : '#ef4444');
+            var isMultiSelect = question.is_multi_select || false;
+
+            var answerHtml = '';
+            if (question.question_type === 'mcq') {
+                var multiSelectBadge = isMultiSelect ? '<span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 8px;">☑️☑️ Multi-Select</span>' : '';
+                answerHtml = `
+                    <div style="margin: 15px 0;">
+                        <div style="margin-bottom: 10px;">
+                            <strong>Student Answer:</strong>${multiSelectBadge}<br>
+                            <span style="color: ${isCorrect ? '#10b981' : '#ef4444'}; font-weight: 500;">
+                                ${question.selected_option || 'No answer'}
+                            </span>
+                        </div>
+                        ${!isCorrect ? `
+                        <div style="margin-top: 10px; padding: 10px; background: #f0fdf4; border-radius: 6px; border: 1px solid #10b981;">
+                            <strong style="color: #065f46;">Correct Answer:</strong><br>
+                            <span style="color: #10b981; font-weight: 500;">${question.correct_option || 'N/A'}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else {
+                answerHtml = `
+                    <div style="margin: 15px 0;">
+                        <strong>Student Answer:</strong><br>
+                        <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb; min-height: 50px;">
+                            ${question.candidate_answer || 'No answer provided'}
+                        </div>
+                    </div>
+                `;
+            }
+
+            var marksDisplay = `${question.marks_obtained || 0}/${question.marks_total} marks`;
+            if (hasNegative) {
+                marksDisplay += `<br><span style="color: #ef4444; font-size: 0.85rem;">(-${question.negative_marks_applied} negative)</span>`;
+            }
+
+            var questionTypeLabel = question.question_type.toUpperCase();
+            if (isMultiSelect) {
+                questionTypeLabel = 'MCQ (Multi-Select)';
+            }
+
+            return `
+                <div style="
+                    background: ${bgColor};
+                    border-left: 5px solid ${borderColor};
+                    border-radius: 10px;
+                    padding: 25px;
+                    margin-bottom: 25px;
+                    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+                ">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h4 style="margin: 0; color: #333; font-size: 1.1rem;">
+                            Question ${questionNumber} (${questionTypeLabel})
+                        </h4>
+                        <div style="
+                            background: white;
+                            padding: 8px 15px;
+                            border-radius: 8px;
+                            font-weight: 600;
+                            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                            color: ${borderColor};
+                            text-align: right;
+                        ">${marksDisplay}</div>
+                    </div>
+
+                    <div style="font-size: 1.05rem; color: #333; margin-bottom: 15px; line-height: 1.6;">
+                        <strong>Question:</strong> ${question.question_text}
+                    </div>
+
+                    ${answerHtml}
+                    
+                    ${hasNegative ? `
+                        <div class="question-negative-marks">
+                            <span class="negative-text">⚠️ Negative marking applied: -${question.negative_marks_applied} marks</span>
+                        </div>
+                    ` : ''}
+                    
+                    ${question.feedback ? `
+                        <div style="
+                            background: rgba(59, 130, 246, 0.1);
+                            border: 1px solid rgba(59, 130, 246, 0.3);
+                            border-radius: 8px;
+                            padding: 15px;
+                            margin-top: 15px;
+                        ">
+                            <strong style="color: #1e40af;">💡 Feedback:</strong><br>
+                            <div style="margin-top: 8px;">${question.feedback}</div>
+                        </div>
+                    ` : ''}
+                    
+                    <div style="
+                        background: #f9fafb;
+                        border: 1px solid #d1d5db;
+                        border-radius: 8px;
+                        padding: 15px;
+                        margin-top: 15px;
+                        display: flex;
+                        align-items: center;
+                        gap: 15px;
+                        flex-wrap: wrap;
+                    ">
+                        <strong style="color: #374151;">✏️ Edit Marks:</strong>
+                        <input type="number" 
+                               id="marks_${question.question_id}" 
+                               value="${question.marks_obtained || 0}" 
+                               min="0" 
+                               max="${question.marks_total}"
+                               step="0.5"
+                               style="
+                                   width: 80px;
+                                   padding: 8px;
+                                   border: 1px solid #d1d5db;
+                                   border-radius: 6px;
+                                   font-size: 14px;
+                               ">
+                        <span style="color: #6b7280; font-weight: 500;">/ ${question.marks_total}</span>
+                        <button onclick="updateMarks('${question.question_id}', '${resultId}')" style="
+                            padding: 8px 15px;
+                            background: #10b981;
+                            color: white;
+                            border: none;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-size: 13px;
+                            font-weight: 600;
+                        ">💾 Update</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function closeModal() {
+            var modal = document.getElementById('examModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        function updateMarks(questionId, resultId) {
+            var newMarks = document.getElementById('marks_' + questionId).value;
+            
+            fetch('/api/update-question-marks', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    question_id: questionId,
+                    result_id: resultId,
+                    new_marks: parseFloat(newMarks)
+                })
+            })
+            .then(function(response) {
+                if (response.ok) {
+                    alert('✅ Marks updated successfully!');
+                    closeModal();
+                    location.reload();
+                } else {
+                    throw new Error('Failed to update marks');
+                }
+            })
+            .catch(function(error) {
+                alert('❌ Error updating marks: ' + error.message);
+            });
+        }
+        
+        // Real-time statistics update
+        function updateStatistics() {
+            const visibleRows = document.querySelectorAll('#resultsTable tbody tr:not([style*="display: none"])');
+            const totalVisible = visibleRows.length;
+            
+            if (totalVisible > 0) {
+                let totalPercentage = 0;
+                let excellentCount = 0;
+                let goodCount = 0;
+                let averageCount = 0;
+                let poorCount = 0;
+                
+                visibleRows.forEach(row => {
+                    const percentage = parseFloat(row.getAttribute('data-percentage'));
+                    const performance = row.getAttribute('data-performance');
+                    
+                    totalPercentage += percentage;
+                    
+                    switch(performance) {
+                        case 'Excellent': excellentCount++; break;
+                        case 'Good': goodCount++; break;
+                        case 'Average': averageCount++; break;
+                        case 'Poor': poorCount++; break;
+                    }
+                });
+                
+                const avgPercentage = (totalPercentage / totalVisible).toFixed(1);
+                
+                // Update statistics if they exist
+                const statCards = document.querySelectorAll('.stat-card .stat-number');
+                if (statCards.length >= 6) {
+                    statCards[0].textContent = totalVisible;
+                    statCards[1].textContent = avgPercentage + '%';
+                    statCards[2].textContent = excellentCount;
+                    statCards[3].textContent = goodCount;
+                    statCards[4].textContent = averageCount;
+                    statCards[5].textContent = poorCount;
+                }
+            }
+        }
+        
+        // Update statistics when filters change
+        const originalFilterResults = filterResults;
+        filterResults = function() {
+            originalFilterResults();
+            updateStatistics();
+        };
+
+        // Initialize sorting on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Page loaded, initializing sorting');
+            
+            // Set default sort (by marks, descending)
+            currentSortField = 'marks';
+            currentSortDirection = 'desc';
+            
+            // Update UI to reflect default state
+            document.getElementById('sortField').value = 'marks';
+            document.getElementById('sortDesc').classList.add('active');
+            document.getElementById('sortAsc').classList.remove('active');
+            
+            // Apply initial sorting
+            sortTableData();
+            updateSortIndicators();
+            
+            console.log('✅ Initial sorting applied');
+        });
+        
+        console.log('✅ All JavaScript functions loaded successfully');
+        console.log('📊 Found {{ results|length }} results on this page');
+    </script>
+</body>
+</html>

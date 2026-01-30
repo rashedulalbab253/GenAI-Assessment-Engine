@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Evaluation - {{ result.candidate_name }}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            padding: 10px;
+            background: #f8f9ff;
+            border-radius: 8px;
+        }
+
+        .info-item label {
+            font-size: 0.8rem;
+            color: #666;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .info-item span {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .error-banner {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #dc2626;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .question-header {
+            background: #f8f9ff;
+            padding: 15px 20px;
+            border-bottom: 2px solid #e1e5e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .question-number {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .question-type {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .type-mcq { background: #dbeafe; color: #1d4ed8; }
+        .type-short { background: #dcfce7; color: #16a34a; }
+        .type-essay { background: #fef3c7; color: #d97706; }
+
+        .question-body {
+            padding: 20px;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .answer-section {
+            background: #f8f9ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .answer-section h4 {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .candidate-answer {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+            white-space: pre-wrap;
+        }
+
+        .mcq-options {
+            list-style: none;
+            margin-top: 10px;
+        }
+
+        .mcq-options li {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            background: #f0f0f0;
+        }
+
+        .mcq-options li.selected {
+            background: #dbeafe;
+            border: 2px solid #3b82f6;
+        }
+
+        .mcq-options li.correct {
+            background: #dcfce7;
+            border: 2px solid #16a34a;
+        }
+
+        .mcq-options li.selected.wrong {
+            background: #fef2f2;
+            border: 2px solid #ef4444;
+        }
+
+        .grading-section {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .marks-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .marks-input label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .marks-input input {
+            width: 80px;
+            padding: 8px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .marks-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .max-marks {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .feedback-input {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .feedback-input textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .feedback-input textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .actions {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            position: sticky;
+            bottom: 20px;
+        }
+
+        .total-display {
+            font-size: 1.2rem;
+        }
+
+        .total-display strong {
+            color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .status-message.success {
+            background: #dcfce7;
+            color: #16a34a;
+            display: block;
+        }
+
+        .status-message.error {
+            background: #fef2f2;
+            color: #dc2626;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .grading-section {
+                flex-direction: column;
+            }
+
+            .feedback-input {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Manual Evaluation</h1>
+        <p>{{ result.exam_title }}</p>
+    </div>
+
+    <div class="container">
+        <!-- Candidate Info -->
+        <div class="info-card">
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Candidate Name</label>
+                    <span>{{ result.candidate_name }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Candidate ID</label>
+                    <span>{{ result.candidate_id }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Submitted At</label>
+                    <span>{{ result.submitted_at }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Time Taken</label>
+                    <span>{{ result.time_taken }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Total Marks</label>
+                    <span>{{ result.total_marks }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Status</label>
+                    <span style="color: #dc2626;">{{ result.evaluation_status }}</span>
+                </div>
+            </div>
+        </div>
+
+        {% if result.evaluation_error %}
+        <div class="error-banner">
+            <strong>Evaluation Error:</strong> {{ result.evaluation_error }}
+        </div>
+        {% endif %}
+
+        <div id="statusMessage" class="status-message"></div>
+
+        <!-- Questions Form -->
+        <form id="evaluationForm">
+            {% for answer in result.answers %}
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-number">Question {{ loop.index }} ({{ answer.section_type }})</span>
+                    <span class="question-type type-{{ answer.question_type }}">
+                        {{ answer.question_type|upper }}
+                    </span>
+                </div>
+                <div class="question-body">
+                    <div class="question-text">{{ answer.question_text }}</div>
+
+                    <div class="answer-section">
+                        <h4>Candidate's Answer:</h4>
+                        {% if answer.question_type == 'mcq' %}
+                            <ul class="mcq-options">
+                                {% for option in answer.options %}
+                                <li class="
+                                    {% if loop.index0 == answer.correct_answer %}correct{% endif %}
+                                    {% if answer.candidate_answer == loop.index0|string %}selected{% if loop.index0 != answer.correct_answer %} wrong{% endif %}{% endif %}
+                                ">
+                                    {{ loop.index }}. {{ option }}
+                                    {% if loop.index0 == answer.correct_answer %} (Correct){% endif %}
+                                    {% if answer.candidate_answer == loop.index0|string %} (Selected){% endif %}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <div class="candidate-answer">{{ answer.candidate_answer or 'No answer provided' }}</div>
+                        {% endif %}
+                    </div>
+
+                    {% if answer.explanation %}
+                    <div class="answer-section">
+                        <h4>Expected Answer / Explanation:</h4>
+                        <div class="candidate-answer">{{ answer.explanation }}</div>
+                    </div>
+                    {% endif %}
+
+                    <div class="grading-section">
+                        <div class="marks-input">
+                            <label>Marks:</label>
+                            <input type="number"
+                                   name="marks_{{ answer.answer_id }}"
+                                   id="marks_{{ answer.answer_id }}"
+                                   data-answer-id="{{ answer.answer_id }}"
+                                   data-max-marks="{{ answer.max_marks }}"
+                                   class="marks-field"
+                                   min="0"
+                                   max="{{ answer.max_marks }}"
+                                   step="0.5"
+                                   value="{{ answer.marks_obtained or 0 }}">
+                            <span class="max-marks">/ {{ answer.max_marks }}</span>
+                        </div>
+                        <div class="feedback-input">
+                            <textarea name="feedback_{{ answer.answer_id }}"
+                                      id="feedback_{{ answer.answer_id }}"
+                                      placeholder="Add feedback for this answer (optional)">{{ answer.feedback if answer.feedback and answer.feedback != 'Awaiting evaluation' else '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </form>
+
+        <!-- Sticky Actions Bar -->
+        <div class="actions">
+            <div class="total-display">
+                Total: <strong id="totalObtained">0</strong> / {{ result.total_marks }}
+                (<span id="percentage">0</span>%)
+            </div>
+            <div>
+                <a href="/admin" class="btn btn-secondary">Cancel</a>
+                <button type="button" id="saveBtn" class="btn btn-success" onclick="saveEvaluation()">
+                    Save Evaluation
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const resultId = "{{ result.result_id }}";
+        const totalMarks = {{ result.total_marks }};
+
+        // Calculate totals on page load and input change
+        function updateTotals() {
+            let total = 0;
+            document.querySelectorAll('.marks-field').forEach(input => {
+                const value = parseFloat(input.value) || 0;
+                const max = parseFloat(input.dataset.maxMarks) || 0;
+                // Clamp value to max
+                if (value > max) {
+                    input.value = max;
+                    total += max;
+                } else if (value < 0) {
+                    input.value = 0;
+                } else {
+                    total += value;
+                }
+            });
+
+            document.getElementById('totalObtained').textContent = total.toFixed(1);
+            const percentage = totalMarks > 0 ? ((total / totalMarks) * 100).toFixed(1) : 0;
+            document.getElementById('percentage').textContent = percentage;
+        }
+
+        // Add event listeners to all marks inputs
+        document.querySelectorAll('.marks-field').forEach(input => {
+            input.addEventListener('input', updateTotals);
+            input.addEventListener('change', updateTotals);
+        });
+
+        // Initial calculation
+        updateTotals();
+
+        async function saveEvaluation() {
+            const saveBtn = document.getElementById('saveBtn');
+            const statusMessage = document.getElementById('statusMessage');
+
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+
+            // Collect all evaluations
+            const evaluations = [];
+            document.querySelectorAll('.marks-field').forEach(input => {
+                const answerId = input.dataset.answerId;
+                const marks = parseFloat(input.value) || 0;
+                const feedbackEl = document.getElementById('feedback_' + answerId);
+                const feedback = feedbackEl ? feedbackEl.value : '';
+
+                evaluations.push({
+                    answer_id: answerId,
+                    marks_obtained: marks,
+                    feedback: feedback || 'Manually evaluated'
+                });
+            });
+
+            try {
+                const response = await fetch(`/api/manual-evaluation/${resultId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ evaluations })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    statusMessage.className = 'status-message success';
+                    statusMessage.textContent = 'Evaluation saved successfully! Redirecting...';
+                    statusMessage.style.display = 'block';
+
+                    setTimeout(() => {
+                        window.location.href = '/admin';
+                    }, 1500);
+                } else {
+                    throw new Error(data.error || 'Failed to save evaluation');
+                }
+            } catch (error) {
+                statusMessage.className = 'status-message error';
+                statusMessage.textContent = 'Error: ' + error.message;
+                statusMessage.style.display = 'block';
+
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save Evaluation';
+            }
+        }
+    </script>
+</body>
+</html>
